@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageTk
 
 #lstDir=next(os.walk("G:/Explorateur_de_fichiers"))[1]
-lstDir=os.listdir("G:\Explorateur_de_fichiers")
+lstDir=os.listdir(os.getcwd()) #Needs to be changed so that people can choose their starting location
 print(len(lstDir))
 print(lstDir)
 
