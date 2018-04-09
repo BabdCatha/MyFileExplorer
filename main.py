@@ -1,6 +1,7 @@
 from tkinter import *
 from random import *
 from platform import system
+import subprocess
 import os
 from PIL import Image, ImageTk
 
@@ -10,8 +11,10 @@ from PIL import Image, ImageTk
 system = system()
 if system == "Windows":
     lstDir=os.listdir("C:\Windows")
+    CurrentDir="C:\Windows"
 else:
     lstDir=os.listdir("/home/babd_catha")
+    CurrentDir="/home/babd_catha"
     
 print(len(lstDir))
 print(lstDir)
@@ -25,18 +28,19 @@ def quitter():
     win1.destroy()
     
 def GetFileName(event):
-    global numerocolonne, numeroligne, x
+    global numerocolonne, numeroligne, x, Grid, CurrentDir
     print(event.x)
     print(event.y)
     event.x-=x/6-3
-    bonjessaieuntruc1=event.x//95
-    bonjessaieuntruc2=event.y//220
-    print(bonjessaieuntruc1,bonjessaieuntruc2
-    
-    
-def ouvrirfichier(nomfichier):
-    print(nomfichier) #Faut que je finisse GetFile avant de finir ça
+    X=int(event.x//95)
+    Y=event.y//145
+    print(X,Y)
+    nomfichier = Grid[X][Y]
+    ouvrirfichier(CurrentDir + "/" + nomfichier)
 
+def ouvrirfichier(nomfichier):
+    subprocess.call(["xdg-open", nomfichier])
+    
 win1=Tk()
 win1.title("Explorateur de fichiers")
 #win1.state("zoomed") #pour windows
