@@ -25,9 +25,13 @@ def quitter():
     win1.destroy()
     
 def GetFileName(event):
-    global numerocolonne, numeroligne
+    global numerocolonne, numeroligne, x
     print(event.x)
     print(event.y)
+    event.x-=x/6-3
+    bonjessaieuntruc1=event.x//95
+    bonjessaieuntruc2=event.y//220
+    print(bonjessaieuntruc1,bonjessaieuntruc2
     
     
 def ouvrirfichier(nomfichier):
@@ -35,7 +39,7 @@ def ouvrirfichier(nomfichier):
 
 win1=Tk()
 win1.title("Explorateur de fichiers")
-#win1.state("zoomed")
+#win1.state("zoomed") #pour windows
 
 scrollbar1=Scrollbar(win1,orient=VERTICAL)
 scrollbar1.pack(side=RIGHT,fill=Y)
@@ -67,13 +71,12 @@ scrollbar1.config(command=can1.yview)
 testEntry=Text(win1,height=10,width=29)
 testEntry.place(x=1,y=y/5*4+1)
 
+
 x1=x-18-95 #C'est pareil, vous auriez pu faire x_max, x_icon ou des trucs comme ça :)
 x2=x/6+20
 y1=y/5-95
 y2=0+20
 
-#Celui qui a eu l'idée d'appeller les icones icon1, icon2 etc... est un débile, c'est pas pratique du tout :p
-#Faut toujours utiliser de chemins relatifs quand on sais pas ou le fichier va s'executer
 icon0=ImageTk.PhotoImage(Image.open("images/directory.png"))
 icon0_hid=ImageTk.PhotoImage(Image.open("images/directory_hidden.png"))
 icon1=ImageTk.PhotoImage(Image.open("images/empty.png"))
