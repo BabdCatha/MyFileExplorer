@@ -10,10 +10,8 @@ from PIL import Image, ImageTk
 #lstDir=next(os.walk("/media/tardis/F8C7-7F8C/Explorateur_de_fichiers"))[1]
 system = system()
 if system == "Windows":
-    lstDir=os.listdir("C:\Windows")
     CurrentDir="C:\Windows"
 else:
-    lstDir=os.listdir("/home/babd_catha")
     CurrentDir="/home/babd_catha"
     
 print(len(lstDir))
@@ -36,10 +34,18 @@ def GetFileName(event):
     Y=event.y//145
     print(X,Y)
     nomfichier = Grid[X][Y]
-    ouvrirfichier(CurrentDir + "/" + nomfichier)
+    estUnDossier = DirGrid[X][Y]
+    ouvrirfichier(CurrentDir + "/" + nomfichier, estUnDossier)
 
-def ouvrirfichier(nomfichier):
-    subprocess.call(["xdg-open", nomfichier])
+def ouvrirfichier(nomfichier, isDossier):
+    
+    global CurrentDir
+    
+    if isDossier:
+        CurrentDir = nomfichier
+        afficherDossier(nomfichier)
+    elif system != "Windows":
+        subprocess.call(["xdg-open", nomfichier])
     
 win1=Tk()
 win1.title("Explorateur de fichiers")
@@ -76,10 +82,10 @@ testEntry=Text(win1,height=10,width=29)
 testEntry.place(x=1,y=y/5*4+1)
 
 
-x1=x-18-95 #C'est pareil, vous auriez pu faire x_max, x_icon ou des trucs comme ça :)
+'''x1=x-18-95 #C'est pareil, vous auriez pu faire x_max, x_icon ou des trucs comme ça :)
 x2=x/6+20
 y1=y/5-95
-y2=0+20
+y2=0+20'''
 
 icon0=ImageTk.PhotoImage(Image.open("images/directory.png"))
 icon0_hid=ImageTk.PhotoImage(Image.open("images/directory_hidden.png"))
@@ -100,15 +106,29 @@ icon7_hid=ImageTk.PhotoImage(Image.open("images/music_hidden.png"))
 icon8=ImageTk.PhotoImage(Image.open("images/video.png"))
 icon8_hid=ImageTk.PhotoImage(Image.open("images/video_hidden.png"))
 
-Grid = [] #grille qui contient les icones
+'''Grid = [] #grille qui contient les icones
 DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
 numeroligne = 0
 numerocolonne = 0
-#IsDirectory = False
+#IsDirectory = False'''
 
-def afficherDossier():
+def afficherDossier(dossier):
     
     global x,x2,y2,numeroligne,numerocolonne,Grid,Dirgrid,can1
+    
+    Grid = [] #grille qui contient les icones
+    DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
+    numeroligne = 0
+    numerocolonne = 0
+    
+    x1=x-18-95 #C'est pareil, vous auriez pu faire x_max, x_icon ou des trucs comme ça :)
+    x2=x/6+20
+    y1=y/5-95
+    y2=0+20
+    
+    can1.create_rectangle(0,0,x,y, fill="Black")
+    
+    lstDir=os.listdir(dossier)
 
     for i in lstDir:
         lstLetters=[]
@@ -171,7 +191,7 @@ def afficherDossier():
             DirGrid[numerocolonne].append(IsDirectory)
             numerocolonne+=1
             
-afficherDossier()
+afficherDossier(CurrentDir)
 
 win1.mainloop()
 
