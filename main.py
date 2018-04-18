@@ -14,9 +14,6 @@ if system == "Windows":
 else:
     CurrentDir="/home/babd_catha"
     
-print(len(lstDir))
-print(lstDir)
-
 def commande1():
     print("LaTeX")
 def commande2():
@@ -26,7 +23,7 @@ def quitter():
     win1.destroy()
     
 def GetFileName(event):
-    global numerocolonne, numeroligne, x, Grid, CurrentDir
+    global numerocolonne, numeroligne, x, Grid, CurrentDir, DirGrid
     print(event.x)
     print(event.y)
     event.x-=x/6-3
@@ -114,7 +111,7 @@ numerocolonne = 0
 
 def afficherDossier(dossier):
     
-    global x,x2,y2,numeroligne,numerocolonne,Grid,Dirgrid,can1
+    global x,x2,y2,numeroligne,numerocolonne,Grid,DirGrid,can1
     
     Grid = [] #grille qui contient les icones
     DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
