@@ -73,8 +73,17 @@ can2=Canvas(width=x/6-3,heigh=y/5*4,highlightthickness=0,bg="grey") #-3 : aligne
 can2.place(x=0,y=y/20)
 can3=Canvas(width=x/6-3,heigh=y/20,highlightthickness=0,bg="gray8")
 can3.place(x=0,y=0)
-can3.create_line((x/6-3)/3,y/20,(x/6-3)/3,x/30,width=2,fill="gray99")
-can3.create_line((x/6-3)/3*2,y/20,(x/6-3)/3*2,x/30,width=2,fill="gray99")
+
+icon_reload=ImageTk.PhotoImage(Image.open("images/arrow-reload.png"))
+icon_backward=ImageTk.PhotoImage(Image.open("images/arrow-backward.png"))
+icon_forward=ImageTk.PhotoImage(Image.open("images/arrow-forward.png"))
+#TODO buttons sizes, actions
+but1=Button(can3,image=icon_reload,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but1.place(x=0,y=0)
+but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but2.place(x=(x/6-3)/100*38,y=0)
+but3=Button(can3,image=icon_forward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but3.place(x=(x/6-3)/8*6,y=0)
 
 scrollbar1.config(command=can1.yview)
 
