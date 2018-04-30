@@ -6,6 +6,7 @@ import os
 from PIL import Image, ImageTk
 
 #TODO: Make the window able to resize itself
+#TODO: Back button
 
 #lstDir=next(os.walk("/media/tardis/F8C7-7F8C/Explorateur_de_fichiers"))[1]
 system = system()
@@ -78,12 +79,6 @@ scrollbar1.config(command=can1.yview)
 testEntry=Text(win1,height=10,width=29)
 testEntry.place(x=1,y=y/5*4+1)
 
-
-'''x1=x-18-95 #C'est pareil, vous auriez pu faire x_max, x_icon ou des trucs comme ça :)
-x2=x/6+20
-y1=y/5-95
-y2=0+20'''
-
 icon0=ImageTk.PhotoImage(Image.open("images/directory.png"))
 icon0_hid=ImageTk.PhotoImage(Image.open("images/directory_hidden.png"))
 icon1=ImageTk.PhotoImage(Image.open("images/empty.png"))
@@ -103,15 +98,9 @@ icon7_hid=ImageTk.PhotoImage(Image.open("images/music_hidden.png"))
 icon8=ImageTk.PhotoImage(Image.open("images/video.png"))
 icon8_hid=ImageTk.PhotoImage(Image.open("images/video_hidden.png"))
 
-'''Grid = [] #grille qui contient les icones
-DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
-numeroligne = 0
-numerocolonne = 0
-#IsDirectory = False'''
-
 def afficherDossier(dossier):
     
-    global x,x2,y2,numeroligne,numerocolonne,Grid,DirGrid,can1
+    global x,x2,y2,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir
     
     Grid = [] #grille qui contient les icones
     DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
@@ -134,6 +123,8 @@ def afficherDossier(dossier):
         print(lstLetters)
         extFile=os.path.splitext(i)[1]
         print(extFile)
+        
+        
         if x2>x1:
             x2,y2=x/6+20,y2+145
             numeroligne+=1
@@ -162,22 +153,22 @@ def afficherDossier(dossier):
                 lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                 IsDirectory = False
             else:
-                if os.path.isfile(i)==True and hidden==0:
+                if os.path.isfile(os.path.join(CurrentDir, i))==True and hidden==0:
                     print("file not hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon2)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = False
-                elif os.path.isfile(i)==True and hidden==1:
+                elif os.path.isfile(os.path.join(CurrentDir, i))==True and hidden==1:
                     print("file hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon2_hid)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = False
-                elif os.path.isfile(i)==False and hidden==0:
+                elif os.path.isfile(os.path.join(CurrentDir, i))==False and hidden==0:
                     print("dir not hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon0)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = True
-                elif os.path.isfile(i)==False and hidden==1:
+                elif os.path.isfile(os.path.join(CurrentDir, i))==False and hidden==1:
                     print("dir hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon0_hid)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
