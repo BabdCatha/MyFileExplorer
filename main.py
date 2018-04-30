@@ -74,6 +74,8 @@ can2.place(x=0,y=0)
 
 scrollbar1.config(command=can1.yview)
 
+can1['yscrollcommand'] = scrollbar1.set
+
 #places=can1.create_rectangle(0,0,x/6,y/5*4,fill="grey")
 #files=can1.create_rectangle(x/6,0,x-18,y,fill="black")
 #notes=can1.create_rectangle(0,y/5*4,x/6,y,fill="white")
