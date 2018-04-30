@@ -8,7 +8,6 @@ from PIL import Image, ImageTk
 #TODO: Make the window able to resize itself
 #TODO: Back button
 
-#lstDir=next(os.walk("/media/tardis/F8C7-7F8C/Explorateur_de_fichiers"))[1]
 system = system()
 if system == "Windows":
     CurrentDir="C:\Windows"
@@ -37,13 +36,16 @@ def GetFileName(event):
 
 def ouvrirfichier(nomfichier, isDossier):
     
-    global CurrentDir
+    global CurrentDir,OldDir
     
     if isDossier:
+        OldDir=CurrentDir
         CurrentDir = nomfichier
         afficherDossier(nomfichier)
     elif system != "Windows":
         subprocess.call(["xdg-open", nomfichier])
+    elif system == "Windows":
+        os.startfile(nomfichier)
     
 win1=Tk()
 win1.title("Explorateur de fichiers")
@@ -106,6 +108,7 @@ def afficherDossier(dossier):
     DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
     numeroligne = 0
     numerocolonne = 0
+    OldDir = ""
     
     x1=x-18-95 #C'est pareil, vous auriez pu faire x_max, x_icon ou des trucs comme ça :)
     x2=x/6+20
