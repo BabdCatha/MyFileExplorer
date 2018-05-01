@@ -70,15 +70,25 @@ can1=Canvas(width=x,height=y,highlightthickness=0,scrollregion=(0,0,x,y*1.5),bg=
 can1.pack()
 can1.bind("<Double-Button-1>", GetFileName)
 can2=Canvas(width=x/6-3,heigh=y/5*4,highlightthickness=0,bg="grey") #-3 : alignement avec le bloc notes (/!\ qui ne marche pas)
-can2.place(x=0,y=0)
+can2.place(x=0,y=y/20)
+can3=Canvas(width=x/6-3,heigh=y/20,highlightthickness=0,bg="gray8")
+can3.place(x=0,y=0)
+
+icon_reload=ImageTk.PhotoImage(Image.open("images/arrow-reload.png"))
+icon_backward=ImageTk.PhotoImage(Image.open("images/arrow-backward.png"))
+icon_forward=ImageTk.PhotoImage(Image.open("images/arrow-forward.png"))
+#TODO buttons sizes, actions
+but1=Button(can3,image=icon_reload,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but1.place(x=0,y=0)
+but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but2.place(x=(x/6-3)/100*38,y=0)
+but3=Button(can3,image=icon_forward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but3.place(x=(x/6-3)/8*6,y=0)
 
 scrollbar1.config(command=can1.yview)
 
 can1['yscrollcommand'] = scrollbar1.set
 
-#places=can1.create_rectangle(0,0,x/6,y/5*4,fill="grey")
-#files=can1.create_rectangle(x/6,0,x-18,y,fill="black")
-#notes=can1.create_rectangle(0,y/5*4,x/6,y,fill="white")
 
 testEntry=Text(win1,height=10,width=29)
 testEntry.place(x=1,y=y/5*4+1)
