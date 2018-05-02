@@ -6,10 +6,14 @@ import os
 from PIL import Image, ImageTk
 
 #TODO: Make the window able to resize itself
-#TODO: Back button
+#TODO: Backward/forward/reload buttons
+#TODO: Fix file to launch/directory to open when clicking on an item after scrolling
+#TODO: Fix bad files/directories order
+#TODO: Fix scrolling zone issues
+#TODO: Right-clic menu
 
-system = system()
-if system == "Windows":
+system=system()
+if system=="Windows":
     CurrentDir="C:\Windows"
 else:
     CurrentDir="/home/babd_catha"
@@ -30,14 +34,14 @@ def GetFileName(event):
     X=int(event.x//95)
     Y=event.y//145
     print(X,Y)
-    nomfichier = Grid[X][Y]
-    estUnDossier = DirGrid[X][Y]
+    nomfichier=Grid[X][Y]
+    estUnDossier=DirGrid[X][Y]
     ouvrirfichier(CurrentDir + "/" + nomfichier, estUnDossier)
 
-def ouvrirfichier(nomfichier, isDossier):
-    
+#def RightClicMenu():
+
+def ouvrirfichier(nomfichier,isDossier):
     global CurrentDir,OldDir
-    
     if isDossier:
         OldDir=CurrentDir
         CurrentDir = nomfichier
@@ -46,30 +50,36 @@ def ouvrirfichier(nomfichier, isDossier):
         subprocess.call(["xdg-open", nomfichier])
     elif system == "Windows":
         os.startfile(nomfichier)
-    
+
 win1=Tk()
 win1.title("Explorateur de fichiers")
-#win1.state("zoomed") #pour windows
+#win1.wm_client("Test")
+favicon=ImageTk.PhotoImage(Image.open("images/favicon2_75.png"))
+win1.tk.call('wm','iconphoto',win1._w,favicon)
+#win1.state("zoomed") #For Windows only
 
 scrollbar1=Scrollbar(win1,orient=VERTICAL)
 scrollbar1.pack(side=RIGHT,fill=Y)
+scrollbar2=Scrollbar(win1,orient=HORIZONTAL)
+scrollbar2.pack(side=BOTTOM,fill=X)
 
 menu1=Menu(win1)
 filemenu = Menu(menu1, tearoff=0)
 filemenu.add_command(label="LaTeX", command=commande1)
-filemenu.add_command(label="Bouton très (in)utile", command=commande2)
+filemenu.add_command(label="Useless button", command=commande2)
 filemenu.add_separator()
 filemenu.add_command(label="Exit", command=quitter)
-menu1.add_cascade(label="Menuuuuu", menu=filemenu)
+menu1.add_cascade(label="Menu", menu=filemenu)
 win1.config(menu=menu1)
 
-x,y=win1.winfo_screenwidth(),win1.winfo_screenheight()-45
+x,y=win1.winfo_screenwidth(),win1.winfo_screenheight()-1/20*win1.winfo_screenheight()
 print(x,y)
 
-can1=Canvas(width=x,height=y,highlightthickness=0,scrollregion=(0,0,x,y*1.5),bg="black")
+can1=Canvas(width=x,height=y,highlightthickness=0,scrollregion=(0,0,x,y),bg="black")
 can1.pack()
-can1.bind("<Double-Button-1>", GetFileName)
-can2=Canvas(width=x/6-3,heigh=y/5*4,highlightthickness=0,bg="grey") #-3 : alignement avec le bloc notes (/!\ qui ne marche pas)
+can1.bind("<Double-Button-1>",GetFileName)
+can1.bind("<Button-3>",GetFileName)
+can2=Canvas(width=x/6,heigh=y/5*4,highlightthickness=0,bg="grey")
 can2.place(x=0,y=y/20)
 can3=Canvas(width=x/6-3,heigh=y/20,highlightthickness=0,bg="gray8")
 can3.place(x=0,y=0)
@@ -77,7 +87,7 @@ can3.place(x=0,y=0)
 icon_reload=ImageTk.PhotoImage(Image.open("images/arrow-reload.png"))
 icon_backward=ImageTk.PhotoImage(Image.open("images/arrow-backward.png"))
 icon_forward=ImageTk.PhotoImage(Image.open("images/arrow-forward.png"))
-#TODO buttons sizes, actions
+#TODO: Fix buttons sizes, set actions
 but1=Button(can3,image=icon_reload,width=75,height=48,bd=0,bg="black",activebackground="gray33")
 but1.place(x=0,y=0)
 but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
@@ -86,12 +96,16 @@ but3=Button(can3,image=icon_forward,width=75,height=48,bd=0,bg="black",activebac
 but3.place(x=(x/6-3)/8*6,y=0)
 
 scrollbar1.config(command=can1.yview)
-
 can1['yscrollcommand'] = scrollbar1.set
+scrollbar2.config(command=can1.xview)
+can1['xscrollcommand']=scrollbar2.set
 
-
-testEntry=Text(win1,height=10,width=29)
-testEntry.place(x=1,y=y/5*4+1)
+"""testEntry=Text(win1,height=10,width=29)
+testEntry.place(x=1,y=y/5*4+1)""" #TODO: BWAAAAAAAAAAAAAAH !!!
+tempcan=Canvas(width=x/6,height=y/5,highlightthickness=0,bg="orange")
+tempcan.place(x=0,y=y/5*4)
+labelRouge=Label(bg="orange",fg="red",text="DANGER, ZONE EN TRAVAUX !")
+labelRouge.place(x=x/35,y=y/5*4+0.44*y/5)
 
 icon0=ImageTk.PhotoImage(Image.open("images/directory.png"))
 icon0_hid=ImageTk.PhotoImage(Image.open("images/directory_hidden.png"))
@@ -114,7 +128,7 @@ icon8_hid=ImageTk.PhotoImage(Image.open("images/video_hidden.png"))
 
 def afficherDossier(dossier):
     
-    global x,x2,y2,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir
+    global x,x2,y2,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir,n
     
     Grid = [] #grille qui contient les icones
     DirGrid = [] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
@@ -126,9 +140,8 @@ def afficherDossier(dossier):
     x2=x/6+20
     y1=y/5-95
     y2=0+20
-    
-    can1.create_rectangle(0,0,x,y, fill="Black")
-    
+
+    can1.create_rectangle(0,0,x,y,fill="Black")
     lstDir=os.listdir(dossier)
 
     for i in lstDir:
@@ -138,15 +151,14 @@ def afficherDossier(dossier):
         print(lstLetters)
         extFile=os.path.splitext(i)[1]
         print(extFile)
-        
-        
+
         if x2>x1:
             x2,y2=x/6+20,y2+145
             numeroligne+=1
             numerocolonne = 0
         if x2<x1:
             hidden = 1 if lstLetters[0]=="." else 0
-            
+
             if numeroligne == 0:
                 Grid.append([])
                 DirGrid.append([])
@@ -168,35 +180,34 @@ def afficherDossier(dossier):
                 lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                 IsDirectory = False
             else:
-                if os.path.isfile(os.path.join(CurrentDir, i))==True and hidden==0:
+                if os.path.isfile(os.path.join(CurrentDir,i))==True and hidden==0:
                     print("file not hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon2)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = False
-                elif os.path.isfile(os.path.join(CurrentDir, i))==True and hidden==1:
+                elif os.path.isfile(os.path.join(CurrentDir,i))==True and hidden==1:
                     print("file hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon2_hid)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = False
-                elif os.path.isfile(os.path.join(CurrentDir, i))==False and hidden==0:
+                elif os.path.isfile(os.path.join(CurrentDir,i))==False and hidden==0:
                     print("dir not hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon0)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = True
-                elif os.path.isfile(os.path.join(CurrentDir, i))==False and hidden==1:
+                elif os.path.isfile(os.path.join(CurrentDir,i))==False and hidden==1:
                     print("dir hidden :",i)
                     icon = can1.create_image(x2+37.5,y2+37.5, image=icon0_hid)
                     lab1=can1.create_text(x2+37.5,y2+87.5,text=i,fill="white",width=75,justify=CENTER)
                     IsDirectory = True
             x2+=95
-            
+
             Grid[numerocolonne].append(i)
             DirGrid[numerocolonne].append(IsDirectory)
             numerocolonne+=1
-            
+
 afficherDossier(CurrentDir)
 
 win1.mainloop()
 
-#Double clic : <Double-Button-1>
 #https://github.com/BabdCatha/MyFileExplorer
