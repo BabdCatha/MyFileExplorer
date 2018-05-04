@@ -149,7 +149,7 @@ def afficherDossier(dossier):
     y1=usedHeight/5-95
     currentHeightIconPlacement=0+20
 
-    #can1.create_rectangle(0,0,usedWidth,usedHeight,fill="Black") #Useless ?
+    can1.create_rectangle(0,0,usedWidth,usedHeight,fill="Black")
     lstDir=os.listdir(dossier)
     def sortFilesDir():
         convert=lambda text: int(text) if text.isdigit() else text
