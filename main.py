@@ -17,7 +17,7 @@ if system=="Windows":
     CurrentDir="C:/Windows"
 else:
     CurrentDir="/home/babd_catha"
-    
+
 def commande1():
     print("LaTeX")
 def commande2():
@@ -25,7 +25,7 @@ def commande2():
 def quitter():
     print("Quitter")
     win1.destroy()
-    
+
 def GetFileName(event):
     global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid
     print(event.x)
@@ -48,8 +48,6 @@ def ouvrirfichier(nomfichier,isDossier):
         subprocess.call(["xdg-open", nomfichier])
     elif system == "Windows":
         os.startfile(nomfichier)
-
-#def RightClicMenu():
 
 win1=Tk()
 win1.title("Explorateur de fichiers")
@@ -77,10 +75,27 @@ print(realWidth,realHeight)
 usedWidth,usedHeight=realWidth-13,realHeight-1/20*realHeight
 print(usedWidth,usedHeight)
 
-can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=(0,0,usedWidth,usedHeight*3),bg="black")
+can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=(0,0,usedWidth,usedHeight*1.5),bg="black")
 can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
-can1.bind("<Button-3>",GetFileName)
+
+def properties(nomfichier):
+    winProperties=Toplevel(win1)
+    lab=Label(winProperties,text="Test"+srt(nomfichier))
+
+RightClic=Menu(win1,tearoff=0)
+RightClic.add_command(label="Nouveau dossier")
+RightClic.add_command(label="Copier")
+RightClic.add_command(label="Couper")
+RightClic.add_command(label="Coller")
+RightClic.add_command(label="Propriétés",command=properties)
+def RightClicMenu(event):
+    try:
+        RightClic.tk_popup(event.x_root,event.y_root+11,0)
+    finally:
+        RightClic.grab_release()
+win1.bind("<Button-3>",RightClicMenu)
+
 can2=Canvas(width=usedWidth/6,heigh=usedHeight/5*4,highlightthickness=0,bg="grey")
 can2.place(x=0,y=usedHeight/20)
 can3=Canvas(width=usedWidth/6-3,heigh=usedHeight/20,highlightthickness=0,bg="gray8")
@@ -135,15 +150,15 @@ icon11=ImageTk.PhotoImage(Image.open("images/internet-file.png"))
 icon11_hid=ImageTk.PhotoImage(Image.open("images/internet-file_hidden.png"))
 
 def afficherDossier(dossier):
-    
+
     global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir
-    
+
     Grid=[] #grille qui contient les icones
     DirGrid=[] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
     numeroligne=0
     numerocolonne=0
     OldDir=""
-    
+
     maxWidthIconPlacement=usedWidth-95 #add -18 after -95 if -13 is not present when usedWidth is defined
     currentWidthIconPlacement=usedWidth/6+20
     y1=usedHeight/5-95
@@ -151,6 +166,9 @@ def afficherDossier(dossier):
 
     can1.create_rectangle(0,0,usedWidth,usedHeight,fill="Black")
     lstDir=os.listdir(dossier)
+    test=usedWidth/145*len(lstDir)
+    print(test)
+    #scrollbar1.config(scrollregion=(0,0,usedWidth,usedHeight*test)) #scrollregion not working ...
     def sortFilesDir():
         convert=lambda text: int(text) if text.isdigit() else text
         alphanum_key=lambda key: [convert(c) for c in re.split('([0-9]+)',key)]
@@ -175,7 +193,7 @@ def afficherDossier(dossier):
             if numeroligne==0:
                 Grid.append([])
                 DirGrid.append([])
-            
+
             if extFile==".txt" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon3)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
