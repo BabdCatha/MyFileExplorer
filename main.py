@@ -16,6 +16,7 @@ import shutil
 nomfichierclique = ""
 lastdir = ""
 nextdir = ""
+copiedfile = ""
 
 system=system()
 if system=="Windows":
@@ -46,9 +47,9 @@ def GetFileName(event):
     ouvrirfichier(CurrentDir + "/" + nomfichier, estUnDossier)
 
 def ouvrirfichier(nomfichier,isDossier):
-    global CurrentDir,OldDir
+    global CurrentDir,OldDir, lastdir
     if isDossier:
-        OldDir=CurrentDir
+        lastdir=CurrentDir
         CurrentDir = nomfichier
         afficherDossier(nomfichier)
     elif system != "Windows":
@@ -86,6 +87,11 @@ can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=
 can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
 
+def GoBack():
+    global lastdir, nextdir, CurrentDir
+    nextdir = CurrentDir
+    afficherDossier(lastdir)
+
 def DeleteFile(nomfichier):
     global Grid,X,Y,DirGrid,CurrentDir
     if os.path.isfile(os.path.join(CurrentDir,nomfichier)) == True:
@@ -98,6 +104,18 @@ def DeleteFile(nomfichier):
         elif os.listdir(os.path.join(CurrentDir,nomfichier)) != []:
             shutil.rmtree(os.path.join(CurrentDir,nomfichier))
             afficherDossier(CurrentDir)
+            
+def CopyFile(nomfichier):
+    global CurrentDir, copiedfile
+    copiedfile = os.path.join(CurrentDir, nomfichier)
+    
+def PasteFile(Directory):
+    global copiedfile
+    if os.path.isfile(copiedfile) == False:
+        shutil.copytree(copiedfile, Directory)
+    elif os.path.isfile(copiedfile) == True:
+        shutil.copy2(copiedfile, Directory)
+    afficherDossier(CurrentDir)
 
 def properties(nomfichier):
     winProperties=Toplevel(win1)
@@ -105,22 +123,25 @@ def properties(nomfichier):
 
 RightClic=Menu(win1,tearoff=0)
 RightClic.add_command(label="Nouveau dossier")
-RightClic.add_command(label="Copier")
+RightClic.add_command(label="Copier", command= lambda: CopyFile(Grid[int(X)][int(Y)]))
 RightClic.add_command(label="Supprimer", command= lambda: DeleteFile(Grid[int(X)][int(Y)]))
-RightClic.add_command(label="Coller")
+RightClic.add_command(label="Coller", command= lambda: PasteFile(CurrentDir))
 RightClic.add_command(label="Propriétés",command= lambda :properties(Grid[int(X)][int(Y)]))
 def RightClicMenu(event):
     try:
         RightClic.tk_popup(event.x_root,event.y_root+11,0)
         global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid,X,Y
-        print(event.x)
-        print(event.y)
-        event.x-=usedWidth/6-3
-        X=int(event.x//95)
-        Y=int(event.y//145)
-        print(X,Y)
-        nomfichier=Grid[X][Y]
-        estUnDossier=DirGrid[X][Y]
+        try:
+            print(event.x)
+            print(event.y)
+            event.x-=usedWidth/6-3
+            X=int(event.x//95)
+            Y=int(event.y//145)
+            print(X,Y)
+            nomfichier=Grid[X][Y]
+            estUnDossier=DirGrid[X][Y]
+        except:
+            pass
     finally:
         RightClic.grab_release()
         
@@ -137,7 +158,7 @@ icon_forward=ImageTk.PhotoImage(Image.open("images/arrow-forward.png"))
 #TODO: Fix buttons sizes, set actions
 but1=Button(can3,image=icon_reload,width=75,height=48,bd=0,bg="black",activebackground="gray33")
 but1.place(x=0,y=0)
-but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33", command = GoBack)
 but2.place(x=(usedWidth/6-3)/100*38,y=0)
 but3=Button(can3,image=icon_forward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
 but3.place(x=(usedWidth/6-3)/8*6,y=0)
@@ -181,13 +202,12 @@ icon11_hid=ImageTk.PhotoImage(Image.open("images/internet-file_hidden.png"))
 
 def afficherDossier(dossier):
 
-    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir
+    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir, lastdir
 
     Grid=[] #grille qui contient les icones
     DirGrid=[] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
     numeroligne=0
     numerocolonne=0
-    OldDir=""
 
     maxWidthIconPlacement=usedWidth-95 #add -18 after -95 if -13 is not present when usedWidth is defined
     currentWidthIconPlacement=usedWidth/6+20
