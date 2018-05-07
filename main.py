@@ -12,11 +12,17 @@ from PIL import Image, ImageTk
 #TODO: Fix scrolling zone issues
 #TODO: Right-clic menu
 
+nomfichierclique = ""
+lastdir = ""
+nextdir = ""
+
 system=system()
 if system=="Windows":
     CurrentDir="C:/Windows"
 else:
     CurrentDir="/home/babd_catha"
+    
+lastdir = CurrentDir
 
 def commande1():
     print("LaTeX")
@@ -81,19 +87,29 @@ can1.bind("<Double-Button-1>",GetFileName)
 
 def properties(nomfichier):
     winProperties=Toplevel(win1)
-    lab=Label(winProperties,text="Test"+srt(nomfichier))
+    lab=Label(winProperties,text="Test"+str(nomfichier)).pack()
 
 RightClic=Menu(win1,tearoff=0)
 RightClic.add_command(label="Nouveau dossier")
 RightClic.add_command(label="Copier")
 RightClic.add_command(label="Couper")
 RightClic.add_command(label="Coller")
-RightClic.add_command(label="Propriétés",command=properties)
+RightClic.add_command(label="Propriétés",command= lambda :properties(Grid[int(X)][int(Y)]))
 def RightClicMenu(event):
     try:
         RightClic.tk_popup(event.x_root,event.y_root+11,0)
+        global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid,X,Y
+        print(event.x)
+        print(event.y)
+        event.x-=usedWidth/6-3
+        X=int(event.x//95)
+        Y=int(event.y//145)
+        print(X,Y)
+        nomfichier=Grid[X][Y]
+        estUnDossier=DirGrid[X][Y]
     finally:
         RightClic.grab_release()
+        
 win1.bind("<Button-3>",RightClicMenu)
 
 can2=Canvas(width=usedWidth/6,heigh=usedHeight/5*4,highlightthickness=0,bg="grey")
@@ -169,11 +185,6 @@ def afficherDossier(dossier):
     test=usedWidth/145*len(lstDir)
     print(test)
     #scrollbar1.config(scrollregion=(0,0,usedWidth,usedHeight*test)) #scrollregion not working ...
-    def sortFilesDir():
-        convert=lambda text: int(text) if text.isdigit() else text
-        alphanum_key=lambda key: [convert(c) for c in re.split('([0-9]+)',key)]
-        lstDir.sort(key=alphanum_key)
-    sortFilesDir()
 
     for i in lstDir:
         lstLetters=[]
