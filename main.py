@@ -4,6 +4,7 @@ from platform import system
 import subprocess
 import os
 from PIL import Image, ImageTk
+import shutil
 
 #TODO: Make the window able to resize itself
 #TODO: Backward/forward/reload buttons
@@ -18,7 +19,7 @@ nextdir = ""
 
 system=system()
 if system=="Windows":
-    CurrentDir="C:/Windows"
+    CurrentDir="c:\\users\\public\\pictures"
 else:
     CurrentDir="/home/babd_catha"
     
@@ -85,6 +86,19 @@ can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=
 can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
 
+def DeleteFile(nomfichier):
+    global Grid,X,Y,DirGrid,CurrentDir
+    if os.path.isfile(os.path.join(CurrentDir,nomfichier)) == True:
+        os.remove(os.path.join(CurrentDir,nomfichier))
+        afficherDossier(CurrentDir)
+    elif os.path.isfile(os.path.join(CurrentDir,nomfichier)) == False:
+        if os.listdir(os.path.join(CurrentDir,nomfichier)) == []: 
+            os.rmdir(os.path.join(CurrentDir,nomfichier))
+            afficherDossier(CurrentDir)
+        elif os.listdir(os.path.join(CurrentDir,nomfichier)) != []:
+            shutil.rmtree(os.path.join(CurrentDir,nomfichier))
+            afficherDossier(CurrentDir)
+
 def properties(nomfichier):
     winProperties=Toplevel(win1)
     lab=Label(winProperties,text="Test"+str(nomfichier)).pack()
@@ -92,7 +106,7 @@ def properties(nomfichier):
 RightClic=Menu(win1,tearoff=0)
 RightClic.add_command(label="Nouveau dossier")
 RightClic.add_command(label="Copier")
-RightClic.add_command(label="Couper")
+RightClic.add_command(label="Supprimer", command= lambda: DeleteFile(Grid[int(X)][int(Y)]))
 RightClic.add_command(label="Coller")
 RightClic.add_command(label="Propriétés",command= lambda :properties(Grid[int(X)][int(Y)]))
 def RightClicMenu(event):
@@ -134,7 +148,7 @@ scrollbar2.config(command=can1.xview)
 can1['xscrollcommand']=scrollbar2.set
 
 """testEntry=Text(win1,height=10,width=29)
-testEntry.place(x=1,y=usedHeight/5*4+1)""" #TODO: BWAAAAAAAAAAAAAAH !!!
+testEntry.place(x=1,y=usedHeight/5*4+1)"""
 tempcan=Canvas(width=usedWidth/6,height=usedHeight/5,highlightthickness=0,bg="orange")
 tempcan.place(x=0,y=usedHeight/5*4)
 labelRouge=Label(bg="orange",fg="red",text="DANGER, ZONE EN TRAVAUX !")
