@@ -17,6 +17,8 @@ nomfichierclique = ""
 lastdir = ""
 nextdir = ""
 copiedfile = ""
+DirList = []
+Index = 0
 
 system=system()
 if system=="Windows":
@@ -25,6 +27,7 @@ else:
     CurrentDir="/home/babd_catha"
     
 lastdir = CurrentDir
+DirList.append(CurrentDir)
 
 def commande1():
     print("LaTeX")
@@ -46,11 +49,19 @@ def GetFileName(event):
     estUnDossier=DirGrid[X][Y]
     ouvrirfichier(CurrentDir + "/" + nomfichier, estUnDossier)
 
-def ouvrirfichier(nomfichier,isDossier):
-    global CurrentDir,OldDir, lastdir
+def ouvrirfichier(nomfichier,isDossier, goback = False):
+    global CurrentDir,OldDir, lastdir, DirList, Index
     if isDossier:
         lastdir=CurrentDir
         CurrentDir = nomfichier
+        if goback == False:
+            Index+=1
+        elif goback == True:
+            pass
+        try:
+            DirList[Index] = CurrentDir
+        except:
+            DirList.append(nomfichier)
         afficherDossier(nomfichier)
     elif system != "Windows":
         subprocess.call(["xdg-open", nomfichier])
@@ -88,9 +99,10 @@ can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
 
 def GoBack():
-    global lastdir, nextdir, CurrentDir
-    nextdir = CurrentDir
-    afficherDossier(lastdir)
+    global DirList, Index, CurrentDir
+    Index-=1
+    CurrentDir = DirList[Index]
+    ouvrirfichier(DirList[Index], True, True)
 
 def DeleteFile(nomfichier):
     global Grid,X,Y,DirGrid,CurrentDir
@@ -202,7 +214,7 @@ icon11_hid=ImageTk.PhotoImage(Image.open("images/internet-file_hidden.png"))
 
 def afficherDossier(dossier):
 
-    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir, lastdir
+    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir,lastdir,DirList
 
     Grid=[] #grille qui contient les icones
     DirGrid=[] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
