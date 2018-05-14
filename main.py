@@ -24,7 +24,7 @@ system=system()
 if system=="Windows":
     CurrentDir="c:\\users\\public\\pictures"
 else:
-    CurrentDir="/home/babd_catha"
+    CurrentDir="/media/user/E2B/ISN/project"
     
 lastdir = CurrentDir
 DirList.append(CurrentDir)
@@ -41,9 +41,12 @@ def GetFileName(event):
     global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid
     print(event.x)
     print(event.y)
+    test=scrollbar1.get()
+    Z=test[0]
+    Z=(usedHeight+320)*Z
     event.x-=usedWidth/6-3
     X=int(event.x//95)
-    Y=event.y//145
+    Y=int((event.y+Z)//130)
     print(X,Y)
     nomfichier=Grid[X][Y]
     estUnDossier=DirGrid[X][Y]
@@ -236,9 +239,15 @@ def afficherDossier(dossier):
         lstLetters=[]
         for j in i:
             lstLetters.append(j)
-        print(lstLetters)
+        #print(lstLetters) #For testing purposes
         extFile=os.path.splitext(i)[1]
         print(extFile)
+        if len(i)>=20:
+            nameLength=len(i)-19
+            i=i[:-nameLength]
+            i2=i+"..."
+        else:
+            i2=i
 
         if currentWidthIconPlacement>maxWidthIconPlacement:
             currentWidthIconPlacement,currentHeightIconPlacement=usedWidth/6+20,currentHeightIconPlacement+145
@@ -253,104 +262,104 @@ def afficherDossier(dossier):
 
             if extFile==".txt" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon3)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".txt" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon3_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".exe" or extFile==".sh" or extFile==".com" or extFile==".bat" or extFile==".py" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon4)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".exe" or extFile==".sh" or extFile==".com" or extFile==".bat" or extFile==".py" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon4_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".zip" or extFile==".rar" or extFile==".7z" or extFile==".gz" or extFile==".xz" or extFile==".tar" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon5)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".zip" or extFile==".rar" or extFile==".7z" or extFile==".gz" or extFile==".xz" or extFile==".tar" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon5_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".jpg" or extFile==".png" or extFile==".gif" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon6)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".jpg" or extFile==".png" or extFile==".gif" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon6_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp3" or extFile==".m4a" or extFile==".wav" or extFile==".ogg" or extFile==".amr" or extFile==".flac" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon7)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp3" or extFile==".m4a" or extFile==".wav" or extFile==".ogg" or extFile==".amr" or extFile==".flac" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon7_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp4" or extFile==".avi" or extFile==".mkv" or extFile==".webm" or extFile==".flv" or extFile==".mov" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon8)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp4" or extFile==".avi" or extFile==".mkv" or extFile==".webm" or extFile==".flv" or extFile==".mov" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon8_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".iso" or extFile==".img" or extFile==".adf" or extFile==".bin" or extFile==".ima" or extFile==".image" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon9)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".iso" or extFile==".img" or extFile==".adf" or extFile==".bin" or extFile==".ima" or extFile==".image" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon_hid9)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".apk" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon10)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".apk" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon10_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".html" or extFile==".htm" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon11)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".html" or extFile==".htm" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon11_hid)
-                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             else:
                 if os.path.isfile(os.path.join(CurrentDir,i))==False and hidden==0:
-                    print("dir not hidden :",i)
+                    #print("dir not hidden :",i) #For testing purposes
                     icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon0)
-                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=True
                 elif os.path.isfile(os.path.join(CurrentDir,i))==False and hidden==1:
-                    print("dir hidden :",i)
+                    #print("dir hidden :",i) #For testing purposes
                     icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon0_hid)
-                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=True
                 elif hidden==0:
                         icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon1)
-                        lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                        lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                         IsDirectory=False
                 elif hidden==1:
                         icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon1_hid)
-                        lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                        lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                         IsDirectory=False
                 elif os.path.isfile(os.path.join(CurrentDir,i))==True and not extFile=="" and hidden==0:
-                    print("file not hidden :",i)
+                    #print("file not hidden :",i) #For testing purposes
                     icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon2)
-                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=False
                 elif os.path.isfile(os.path.join(CurrentDir,i))==True and not extFile=="" and hidden==1:
-                    print("file hidden :",i)
+                    #print("file hidden :",i) #For testing purposes
                     icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon2_hid)
-                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i,fill="white",width=75,justify=CENTER)
+                    lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=False
 
             currentWidthIconPlacement+=95
