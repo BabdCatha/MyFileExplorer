@@ -7,27 +7,24 @@ from PIL import Image, ImageTk
 import shutil
 
 #TODO: Make the window able to resize itself
-#TODO: Backward/forward/reload buttons
-#TODO: Fix file to launch/directory to open when clicking on an item after scrolling
-#TODO: Fix bad files/directories order
-#TODO: Fix scrolling zone issues
+#TODO: Forward button
 #TODO: Right-clic menu
+#TODO: Left panel items
+###TODO: Fix opening file after going forward issue
+#TODO: Add informations in Properties : file size, type (xdg), location, checksum (md5, sha1, sha512 ...) ...
 
-nomfichierclique = ""
-lastdir = ""
-nextdir = ""
-copiedfile = ""
-DirList = []
-Index = 0
+#FileNameclique="" #Not used
+LastDir=""
+NextDir=""
+CopiedFile=""
 
 system=system()
 if system=="Windows":
-    CurrentDir="c:\\users\\public\\pictures"
+    CurrentDir="tests"
 else:
-    CurrentDir="/media/user/E2B/ISN/project"
-    
-lastdir = CurrentDir
-DirList.append(CurrentDir)
+    CurrentDir="tests"
+
+LastDir=CurrentDir
 
 def commande1():
     print("LaTeX")
@@ -36,6 +33,15 @@ def commande2():
 def quitter():
     print("Quitter")
     win1.destroy()
+def MIMETypes():
+    subprocess.call(["xdg-mime default eog.desktop image/*"])
+    subprocess.call(["xdg-mime default vlc.desktop video/*"])
+    subprocess.call(["xdg-mime default firefox.desktop text/html"])
+    subprocess.call(["xdg-mime default .desktop /*"])
+    subprocess.call(["xdg-mime default .desktop /*"])
+    subprocess.call(["xdg-mime default .desktop /*"])
+    subprocess.call(["xdg-mime default .desktop /*"])
+    subprocess.call(["xdg-mime default .desktop /*"])
 
 def GetFileName(event):
     global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid
@@ -48,28 +54,21 @@ def GetFileName(event):
     X=int(event.x//95)
     Y=int((event.y+Z)//130)
     print(X,Y)
-    nomfichier=Grid[X][Y]
+    FileName=Grid[X][Y]
     estUnDossier=DirGrid[X][Y]
-    ouvrirfichier(CurrentDir + "/" + nomfichier, estUnDossier)
+    OpenFile(CurrentDir+"/"+FileName,estUnDossier)
 
-def ouvrirfichier(nomfichier,isDossier, goback = False):
-    global CurrentDir,OldDir, lastdir, DirList, Index
+def OpenFile(FileName,isDossier):
+    global CurrentDir,OldDir,LastDir
     if isDossier:
-        lastdir=CurrentDir
-        CurrentDir = nomfichier
-        if goback == False:
-            Index+=1
-        elif goback == True:
-            pass
-        try:
-            DirList[Index] = CurrentDir
-        except:
-            DirList.append(nomfichier)
-        afficherDossier(nomfichier)
-    elif system != "Windows":
-        subprocess.call(["xdg-open", nomfichier])
-    elif system == "Windows":
-        os.startfile(nomfichier)
+        LastDir=CurrentDir
+        CurrentDir=FileName
+        AfficherDossier(FileName)
+    elif system!="Windows":
+        subprocess.call(["xdg-open",FileName])#Do not open files correctly
+        #subprocess.call(["mimeopen",FileName])#Close files when file explorer is closed
+    elif system=="Windows":
+        os.startfile(FileName)
 
 win1=Tk()
 win1.title("Explorateur de fichiers")
@@ -84,12 +83,15 @@ scrollbar2=Scrollbar(win1,orient=HORIZONTAL)
 scrollbar2.pack(side=BOTTOM,fill=X)
 
 menu1=Menu(win1)
-filemenu = Menu(menu1, tearoff=0)
-filemenu.add_command(label="LaTeX", command=commande1)
-filemenu.add_command(label="Useless button", command=commande2)
+filemenu=Menu(menu1, tearoff=0)
+filemenu.add_command(label="LaTeX",command=commande1)
+filemenu.add_command(label="Useless button",command=commande2)
 filemenu.add_separator()
-filemenu.add_command(label="Exit", command=quitter)
-menu1.add_cascade(label="Menu", menu=filemenu)
+filemenu.add_command(label="Set MIME types",command=MIMETypes)
+filemenu.add_separator()
+filemenu.add_separator()
+filemenu.add_command(label="Exit",command=quitter)
+menu1.add_cascade(label="Menu",menu=filemenu)
 win1.config(menu=menu1)
 
 realWidth,realHeight=win1.winfo_screenwidth(),win1.winfo_screenheight()
@@ -101,47 +103,65 @@ can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=
 can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
 
+def Reload():
+    global CurrentDir
+    AfficherDossier(CurrentDir)
+
 def GoBack():
-    global DirList, Index, CurrentDir
-    Index-=1
-    CurrentDir = DirList[Index]
-    ouvrirfichier(DirList[Index], True, True)
+    global LastDir,NextDir,CurrentDir
+    NextDir=CurrentDir
+    AfficherDossier(LastDir)
 
-def DeleteFile(nomfichier):
+"""def GoForward():
+    LastDir,NextDir,CurrentDir""" #TODO: DO IT !!!
+
+def DeleteFile(FileName):
     global Grid,X,Y,DirGrid,CurrentDir
-    if os.path.isfile(os.path.join(CurrentDir,nomfichier)) == True:
-        os.remove(os.path.join(CurrentDir,nomfichier))
-        afficherDossier(CurrentDir)
-    elif os.path.isfile(os.path.join(CurrentDir,nomfichier)) == False:
-        if os.listdir(os.path.join(CurrentDir,nomfichier)) == []: 
-            os.rmdir(os.path.join(CurrentDir,nomfichier))
-            afficherDossier(CurrentDir)
-        elif os.listdir(os.path.join(CurrentDir,nomfichier)) != []:
-            shutil.rmtree(os.path.join(CurrentDir,nomfichier))
-            afficherDossier(CurrentDir)
-            
-def CopyFile(nomfichier):
-    global CurrentDir, copiedfile
-    copiedfile = os.path.join(CurrentDir, nomfichier)
-    
-def PasteFile(Directory):
-    global copiedfile
-    if os.path.isfile(copiedfile) == False:
-        shutil.copytree(copiedfile, Directory)
-    elif os.path.isfile(copiedfile) == True:
-        shutil.copy2(copiedfile, Directory)
-    afficherDossier(CurrentDir)
+    if os.path.isfile(os.path.join(CurrentDir,FileName))==True:
+        os.remove(os.path.join(CurrentDir,FileName))
+        AfficherDossier(CurrentDir)
+    elif os.path.isfile(os.path.join(CurrentDir,FileName))==False:
+        if os.listdir(os.path.join(CurrentDir,FileName))==[]:
+            os.rmdir(os.path.join(CurrentDir,FileName))
+            AfficherDossier(CurrentDir)
+        elif os.listdir(os.path.join(CurrentDir,FileName))!=[]:
+            shutil.rmtree(os.path.join(CurrentDir,FileName))
+            AfficherDossier(CurrentDir)
 
-def properties(nomfichier):
+def CopyFile(FileName):
+    global CurrentDir,CopiedFile
+    CopiedFile=os.path.join(CurrentDir,FileName)
+
+def PasteFile(Directory):
+    global CopiedFile
+    if os.path.isfile(CopiedFile)==False:
+        shutil.copytree(CopiedFile,Directory)
+    elif os.path.isfile(CopiedFile)==True:
+        shutil.copy2(CopiedFile,Directory)
+    AfficherDossier(CurrentDir)
+
+def Properties(FileName):
+    global CurrentDir
+    OctSize=os.path.getsize(str(CurrentDir)+"/"+str(FileName))
     winProperties=Toplevel(win1)
-    lab=Label(winProperties,text="Test"+str(nomfichier)).pack()
+    winProperties.configure(bg="black")
+    lab=Label(winProperties,bg="black",fg="white",text="Nom : "+str(FileName)+"\nTaille : "+"("+str(OctSize)+" octets)").pack()
+
+def NewDir(): #TODO
+    global CurrentDir
+    #TODO: add input window
+    print(CurrentDir)
+    NewDirectory=CurrentDir+str("testdir")
+    if not os.path.exists(NewDirectory):
+        os.makedirs(NewDirectory)
+        print("OK")
 
 RightClic=Menu(win1,tearoff=0)
-RightClic.add_command(label="Nouveau dossier")
-RightClic.add_command(label="Copier", command= lambda: CopyFile(Grid[int(X)][int(Y)]))
-RightClic.add_command(label="Supprimer", command= lambda: DeleteFile(Grid[int(X)][int(Y)]))
-RightClic.add_command(label="Coller", command= lambda: PasteFile(CurrentDir))
-RightClic.add_command(label="Propriétés",command= lambda :properties(Grid[int(X)][int(Y)]))
+RightClic.add_command(label="Nouveau dossier",command=lambda:NewDir(CurrentDir))#TODO
+RightClic.add_command(label="Copier",command=lambda:CopyFile(Grid[int(X)][int(Y)]))
+RightClic.add_command(label="Supprimer",command=lambda:DeleteFile(Grid[int(X)][int(Y)]))
+RightClic.add_command(label="Coller",command=lambda:PasteFile(CurrentDir))
+RightClic.add_command(label="Propriétés",command=lambda:Properties(Grid[int(X)][int(Y)]))
 def RightClicMenu(event):
     try:
         RightClic.tk_popup(event.x_root,event.y_root+11,0)
@@ -153,13 +173,13 @@ def RightClicMenu(event):
             X=int(event.x//95)
             Y=int(event.y//145)
             print(X,Y)
-            nomfichier=Grid[X][Y]
+            FileName=Grid[X][Y]
             estUnDossier=DirGrid[X][Y]
         except:
             pass
     finally:
         RightClic.grab_release()
-        
+
 win1.bind("<Button-3>",RightClicMenu)
 
 can2=Canvas(width=usedWidth/6,heigh=usedHeight/5*4,highlightthickness=0,bg="grey")
@@ -170,10 +190,10 @@ can3.place(x=0,y=0)
 icon_reload=ImageTk.PhotoImage(Image.open("images/arrow-reload.png"))
 icon_backward=ImageTk.PhotoImage(Image.open("images/arrow-backward.png"))
 icon_forward=ImageTk.PhotoImage(Image.open("images/arrow-forward.png"))
-#TODO: Fix buttons sizes, set actions
-but1=Button(can3,image=icon_reload,width=75,height=48,bd=0,bg="black",activebackground="gray33")
+#TODO: Fix buttons sizes
+but1=Button(can3,image=icon_reload,width=75,height=48,bd=0,bg="black",activebackground="gray33",command=Reload)
 but1.place(x=0,y=0)
-but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33", command = GoBack)
+but2=Button(can3,image=icon_backward,width=75,height=48,bd=0,bg="black",activebackground="gray33",command=GoBack)
 but2.place(x=(usedWidth/6-3)/100*38,y=0)
 but3=Button(can3,image=icon_forward,width=75,height=48,bd=0,bg="black",activebackground="gray33")
 but3.place(x=(usedWidth/6-3)/8*6,y=0)
@@ -215,9 +235,9 @@ icon10_hid=ImageTk.PhotoImage(Image.open("images/apk_hidden.png"))
 icon11=ImageTk.PhotoImage(Image.open("images/internet-file.png"))
 icon11_hid=ImageTk.PhotoImage(Image.open("images/internet-file_hidden.png"))
 
-def afficherDossier(dossier):
+def AfficherDossier(dossier):
 
-    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir,lastdir,DirList
+    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir,LastDir
 
     Grid=[] #grille qui contient les icones
     DirGrid=[] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
@@ -239,20 +259,20 @@ def afficherDossier(dossier):
         lstLetters=[]
         for j in i:
             lstLetters.append(j)
-        #print(lstLetters) #For testing purposes
+        #print(lstLetters) # For testing purposes
         extFile=os.path.splitext(i)[1]
         print(extFile)
-        if len(i)>=20:
-            nameLength=len(i)-19
-            i=i[:-nameLength]
-            i2=i+"..."
+        if len(i)>17:
+            nameLength=len(i)-17
+            i2=i[:-nameLength]
+            i2=i2+"..."
         else:
             i2=i
 
         if currentWidthIconPlacement>maxWidthIconPlacement:
             currentWidthIconPlacement,currentHeightIconPlacement=usedWidth/6+20,currentHeightIconPlacement+145
             numeroligne+=1
-            numerocolonne = 0
+            numerocolonne=0
         if currentWidthIconPlacement<maxWidthIconPlacement:
             hidden=1 if lstLetters[0]=="." else 0
 
@@ -261,104 +281,104 @@ def afficherDossier(dossier):
                 DirGrid.append([])
 
             if extFile==".txt" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon3)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon3)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".txt" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon3_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon3_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".exe" or extFile==".sh" or extFile==".com" or extFile==".bat" or extFile==".py" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon4)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon4)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".exe" or extFile==".sh" or extFile==".com" or extFile==".bat" or extFile==".py" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon4_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon4_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".zip" or extFile==".rar" or extFile==".7z" or extFile==".gz" or extFile==".xz" or extFile==".tar" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon5)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon5)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".zip" or extFile==".rar" or extFile==".7z" or extFile==".gz" or extFile==".xz" or extFile==".tar" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon5_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon5_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".jpg" or extFile==".png" or extFile==".gif" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon6)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon6)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".jpg" or extFile==".png" or extFile==".gif" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon6_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon6_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp3" or extFile==".m4a" or extFile==".wav" or extFile==".ogg" or extFile==".amr" or extFile==".flac" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon7)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon7)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp3" or extFile==".m4a" or extFile==".wav" or extFile==".ogg" or extFile==".amr" or extFile==".flac" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon7_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon7_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp4" or extFile==".avi" or extFile==".mkv" or extFile==".webm" or extFile==".flv" or extFile==".mov" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon8)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon8)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".mp4" or extFile==".avi" or extFile==".mkv" or extFile==".webm" or extFile==".flv" or extFile==".mov" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon8_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon8_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".iso" or extFile==".img" or extFile==".adf" or extFile==".bin" or extFile==".ima" or extFile==".image" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon9)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon9)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".iso" or extFile==".img" or extFile==".adf" or extFile==".bin" or extFile==".ima" or extFile==".image" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon_hid9)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon_hid9)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".apk" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon10)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon10)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".apk" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon10_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon10_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".html" or extFile==".htm" and hidden==0:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon11)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon11)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             elif extFile==".html" or extFile==".htm" and hidden==1:
-                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon11_hid)
+                icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon11_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
             else:
                 if os.path.isfile(os.path.join(CurrentDir,i))==False and hidden==0:
-                    #print("dir not hidden :",i) #For testing purposes
-                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon0)
+                    #print("dir not hidden :",i) # For testing purposes
+                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon0)
                     lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=True
                 elif os.path.isfile(os.path.join(CurrentDir,i))==False and hidden==1:
-                    #print("dir hidden :",i) #For testing purposes
-                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon0_hid)
+                    #print("dir hidden :",i) # For testing purposes
+                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon0_hid)
                     lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=True
                 elif hidden==0:
-                        icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon1)
+                        icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon1)
                         lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                         IsDirectory=False
                 elif hidden==1:
-                        icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon1_hid)
+                        icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon1_hid)
                         lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                         IsDirectory=False
                 elif os.path.isfile(os.path.join(CurrentDir,i))==True and not extFile=="" and hidden==0:
-                    #print("file not hidden :",i) #For testing purposes
-                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon2)
+                    #print("file not hidden :",i) # For testing purposes
+                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon2)
                     lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=False
                 elif os.path.isfile(os.path.join(CurrentDir,i))==True and not extFile=="" and hidden==1:
-                    #print("file hidden :",i) #For testing purposes
-                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5, image=icon2_hid)
+                    #print("file hidden :",i) # For testing purposes
+                    icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon2_hid)
                     lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                     IsDirectory=False
 
@@ -368,7 +388,7 @@ def afficherDossier(dossier):
             DirGrid[numerocolonne].append(IsDirectory)
             numerocolonne+=1
 
-afficherDossier(CurrentDir)
+AfficherDossier(CurrentDir)
 
 win1.mainloop()
 
