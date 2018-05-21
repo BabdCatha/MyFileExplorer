@@ -132,14 +132,16 @@ def PasteFile(Directory):
     elif os.path.isfile(CopiedFile)==True:
         shutil.copy2(CopiedFile,Directory)
     AfficherDossier(CurrentDir)
+    
+def RenameFile(a, WinRename, FileName): 
+    global CurrentDir  #Must be an argument even if it is not used
+    NewFileName=str(a)
+    NewFileName=CurrentDir+"/"+str(NewFileName)
+    WinRename.destroy()
+    shutil.move(str(CurrentDir)+"/"+str(FileName),str(NewFileName))
+    Reload()
 
 def Rename(CurrentDir,FileName):
-    def RenameFile(a): #Must be an argument even if it is not used
-        NewFileName=str(FileRename.get())
-        NewFileName=CurrentDir+"/"+str(NewFileName)
-        WinRename.destroy()
-        shutil.move(str(CurrentDir)+"/"+str(FileName),str(NewFileName))
-        Reload()
     WinRename=Toplevel(win1)
     WinRename.configure(bg="black")
     WinRename.title("Renommer un fichier")
@@ -147,7 +149,7 @@ def Rename(CurrentDir,FileName):
     RenameLabel.pack()
     NewFileName=StringVar(WinRename)
     FileRename=Entry(WinRename,bg="white",fg="black",textvariable=NewFileName)
-    FileRename.bind("<Return>",RenameFile)
+    FileRename.bind("<Return>",lambda x: RenameFile(FileRename.get(), WinRename, FileName))
     FileRename.pack(side=TOP)
     WinRename.mainloop()
 
