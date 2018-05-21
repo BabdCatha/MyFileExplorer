@@ -6,6 +6,7 @@ import os
 from PIL import Image, ImageTk
 import shutil
 import hashlib
+import humanize
 
 #TODO: Make the window able to resize itself
 #TODO: Forward button
@@ -24,7 +25,7 @@ system=system()
 if system=="Windows":
     CurrentDir="tests"
 else:
-    CurrentDir="/home/babd_catha"
+    CurrentDir="tests"
 
 LastDir=CurrentDir
 
@@ -99,7 +100,7 @@ def GoBack():
 
 """def GoForward():
     LastDir,NextDir,CurrentDir""" #TODO: JUST DO IT !!!
-    
+
 def CreateNewDirectory(a, WinNewDirectory):
     global CurrentDir #Must be an argument even if it is not used
     NewDirectoryName=str(a)
@@ -132,8 +133,8 @@ def PasteFile(Directory):
     elif os.path.isfile(CopiedFile)==True:
         shutil.copy2(CopiedFile,Directory)
     AfficherDossier(CurrentDir)
-    
-def RenameFile(a, WinRename, FileName): 
+
+def RenameFile(a, WinRename, FileName):
     global CurrentDir  #Must be an argument even if it is not used
     NewFileName=str(a)
     NewFileName=CurrentDir+"/"+str(NewFileName)
@@ -201,7 +202,7 @@ def Properties(FileName):
     SHA512Hash=hashlib.sha512(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
     WinProperties=Toplevel(win1)
     WinProperties.configure(bg="black")
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str()+"("+str(OctSize)+" octets)").pack()
+    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
     #TODO: If not a directory, execute what follows
     Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Sommes de contrôle :").pack()
     Label(WinProperties,bg="black",fg="white",justify=LEFT,text="MD5 :").pack()
