@@ -6,6 +6,7 @@ import os
 from PIL import Image, ImageTk
 import shutil
 import hashlib
+#import humanize
 
 #TODO: Make the window able to resize itself
 #TODO: Forward button
@@ -24,7 +25,7 @@ system=system()
 if system=="Windows":
     CurrentDir="tests"
 else:
-    CurrentDir="tests"
+    CurrentDir="/"
 
 LastDir=CurrentDir
 
@@ -60,6 +61,8 @@ def OpenFile(FileName,isDossier):
         #subprocess.call(["mimeopen",FileName])#Close files when file explorer is closed
     elif system=="Windows":
         os.startfile(FileName)
+    can1.delete(RectangleFiles)
+    
 
 win1=Tk()
 win1.title("Explorateur de fichiers")
@@ -69,8 +72,8 @@ win1.tk.call('wm','iconphoto',win1._w,favicon)
 
 scrollbar1=Scrollbar(win1,orient=VERTICAL)
 scrollbar1.pack(side=RIGHT,fill=Y)
-scrollbar2=Scrollbar(win1,orient=HORIZONTAL)
-scrollbar2.pack(side=BOTTOM,fill=X)
+"""scrollbar2=Scrollbar(win1,orient=HORIZONTAL)
+scrollbar2.pack(side=BOTTOM,fill=X)"""
 
 menu1=Menu(win1)
 filemenu=Menu(menu1, tearoff=0)
@@ -85,7 +88,7 @@ realWidth,realHeight=win1.winfo_screenwidth(),win1.winfo_screenheight()
 usedWidth,usedHeight=realWidth-13,realHeight-1/20*realHeight
 print("Screen resolution :\nReal x (realHeight) :",realHeight,"\nReal y (realWidth) :",realWidth,"\nUsed x (usedHeight) :",usedHeight,"\nUsed y (usedWidth) :",usedWidth,"\n") #Debug
 
-can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=(0,0,usedWidth,usedHeight*1.5),bg="black")
+can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=(0,0,usedWidth,usedHeight*3),bg="black")
 can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
 
@@ -95,19 +98,21 @@ def Reload():
 def GoBack():
     global LastDir,NextDir,CurrentDir
     NextDir=CurrentDir
-    AfficherDossier(LastDir)
+    OpenFile(LastDir,True)
 
 """def GoForward():
-    LastDir,NextDir,CurrentDir""" #TODO: DO IT !!!
+    LastDir,NextDir,CurrentDir""" #TODO: JUST DO IT !!!
+
+def CreateNewDirectory(a,WinNewDirectory):
+    global CurrentDir
+    NewDirectoryName=str(a)
+    MakeNewDirectory=CurrentDir+"/"+str(NewDirectoryName)
+    if not os.path.exists(MakeNewDirectory):
+        os.makedirs(MakeNewDirectory)
+        Reload()
+        WinNewDirectory.destroy()
 
 def NewDir(CurrentDir):
-    def CreateNewDirectory(a): #Must be an argument even if it is not used
-        NewDirectoryName=str(NameDir.get())
-        MakeNewDirectory=CurrentDir+"/"+str(NewDirectoryName)
-        WinNewDirectory.destroy()
-        if not os.path.exists(MakeNewDirectory):
-            os.makedirs(MakeNewDirectory)
-            Reload()
     WinNewDirectory=Toplevel(win1)
     WinNewDirectory.configure(bg="black")
     WinNewDirectory.title("Nouveau dossier")
@@ -115,7 +120,7 @@ def NewDir(CurrentDir):
     NewDirLabel.pack()
     NewDirectoryName=StringVar(WinNewDirectory)
     NameDir=Entry(WinNewDirectory,bg="white",fg="black",textvariable=NewDirectoryName)
-    NameDir.bind("<Return>",CreateNewDirectory)
+    NameDir.bind("<Return>",lambda x : CreateNewDirectory(NameDir.get(), WinNewDirectory))
     NameDir.pack(side=TOP)
     WinNewDirectory.mainloop()
 
@@ -131,21 +136,23 @@ def PasteFile(Directory):
         shutil.copy2(CopiedFile,Directory)
     AfficherDossier(CurrentDir)
 
+def RenameFile(a, WinRename, FileName):
+    global CurrentDir  #Must be an argument even if it is not used
+    NewFileName=str(a)
+    NewFileName=CurrentDir+"/"+str(NewFileName)
+    WinRename.destroy()
+    shutil.move(str(CurrentDir)+"/"+str(FileName),str(NewFileName))
+    Reload()
 def Rename(CurrentDir,FileName):
-    def RenameFile(a): #Must be an argument even if it is not used
-        NewFileName=str(FileRename.get())
-        NewFileName=CurrentDir+"/"+str(NewFileName)
-        WinRename.destroy()
-        shutil.move(str(CurrentDir)+"/"+str(FileName),str(NewFileName))
-        Reload()
     WinRename=Toplevel(win1)
     WinRename.configure(bg="black")
-    WinRename.title("Renommer un fichier")
+    WinRename.title("Renommer")
     RenameLabel=Label(WinRename,bg="black",fg="white",text="Entrez ici le nouveau nom du fichier :")
     RenameLabel.pack()
     NewFileName=StringVar(WinRename)
     FileRename=Entry(WinRename,bg="white",fg="black",textvariable=NewFileName)
-    FileRename.bind("<Return>",RenameFile)
+    FileRename.insert(END,FileName)
+    FileRename.bind("<Return>",lambda x: RenameFile(FileRename.get(), WinRename, FileName))
     FileRename.pack(side=TOP)
     WinRename.mainloop()
 
@@ -174,7 +181,7 @@ def DeleteFile(FileName): #Main delete confirmation window
     print("RememberChoice",RememberChoice)""" #Not working
     if 0==0: #Not working : RememberChoice==0
         WinDeleteConfirm=Toplevel(win1)
-        WinDeleteConfirm.title("Supprimer un élément")
+        WinDeleteConfirm.title("Supprimer")
         WinDeleteConfirm.configure(bg="black")
         WarningLabel=Label(WinDeleteConfirm,bg="black",fg="white",text="Êtes vous sûr de vouloir supprimer\n\""+str(FileName)+"\" ?")
         WarningLabel.pack(side=TOP)
@@ -189,28 +196,32 @@ def DeleteFile(FileName): #Main delete confirmation window
     else:
         ConfirmDelete(CurrentDir,FileName) #Working ... Unfortunately ...
 
-def Properties(FileName):
+def Properties(FileName,FileOrNot):
+    print(FileOrNot)
     global CurrentDir
     OctSize=os.path.getsize(str(CurrentDir)+"/"+str(FileName))
-    MD5Hash=hashlib.md5(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
-    SHA1Hash=hashlib.sha1(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
-    SHA512Hash=hashlib.sha512(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
     WinProperties=Toplevel(win1)
+    WinProperties.title("Propriétés")
     WinProperties.configure(bg="black")
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str()+"("+str(OctSize)+" octets)").pack()
+    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : ("+str(OctSize)+" octets)").pack()
+    #Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
     #TODO: If not a directory, execute what follows
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Sommes de contrôle :").pack()
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="MD5 :").pack()
-    MD5Entry=Entry(WinProperties,bg="black",fg="white",highlightthickness=0)
-    MD5Entry.insert(END,str(MD5Hash))
-    MD5Entry.pack()
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="SHA1 :").pack()
-    SHA1Entry=Entry(WinProperties,bg="black",fg="white",highlightthickness=0)
-    SHA1Entry.insert(END,str(SHA1Hash))
-    SHA1Entry.pack()
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="SHA512 :").pack()
-    SHA512Entry=Entry(WinProperties,bg="black",fg="white",highlightthickness=0)
-    SHA512Entry.insert(END,str(SHA512Hash))
+    if FileOrNot==True:
+        MD5Hash=hashlib.md5(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
+        SHA1Hash=hashlib.sha1(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
+        SHA512Hash=hashlib.sha512(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
+        Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Sommes de contrôle :").pack()
+        Label(WinProperties,bg="black",fg="white",justify=LEFT,text="MD5 :").pack()
+        MD5Entry=Entry(WinProperties,bg="black",fg="white",highlightthickness=0)
+        MD5Entry.insert(END,str(MD5Hash))
+        MD5Entry.pack()
+        Label(WinProperties,bg="black",fg="white",justify=LEFT,text="SHA1 :").pack()
+        SHA1Entry=Entry(WinProperties,bg="black",fg="white",highlightthickness=0)
+        SHA1Entry.insert(END,str(SHA1Hash))
+        SHA1Entry.pack()
+        Label(WinProperties,bg="black",fg="white",justify=LEFT,text="SHA512 :").pack()
+        SHA512Entry=Entry(WinProperties,bg="black",fg="white",highlightthickness=0)
+        SHA512Entry.insert(END,str(SHA512Hash))
     SHA512Entry.pack()
 
 def sortFilesDir(lstDir):
@@ -224,7 +235,7 @@ RightClic.add_command(label="Copier",command=lambda:CopyFile(Grid[int(X)][int(Y)
 RightClic.add_command(label="Coller",command=lambda:PasteFile(CurrentDir))
 RightClic.add_command(label="Renommer",command=lambda:Rename(CurrentDir,Grid[int(X)][int(Y)]))
 RightClic.add_command(label="Supprimer",command=lambda:DeleteFile(Grid[int(X)][int(Y)]))
-RightClic.add_command(label="Propriétés",command=lambda:Properties(Grid[int(X)][int(Y)]))
+RightClic.add_command(label="Propriétés",command=lambda:Properties(Grid[int(X)][int(Y)],os.path.isfile(os.path.join(CurrentDir,Grid[int(X)][int(Y)]))))
 def RightClicMenu(event):
     if event.x>=realWidth/6 and event.y>=0:
         try:
@@ -244,8 +255,16 @@ def RightClicMenu(event):
 
 win1.bind("<Button-3>",RightClicMenu)
 
-can2=Canvas(width=usedWidth/6,heigh=usedHeight/5*4,highlightthickness=0,bg="grey")
+can2=Canvas(width=usedWidth/6,heigh=usedHeight,highlightthickness=0,bg="grey")
 can2.place(x=0,y=usedHeight/20)
+
+def rootFunction(CurrentDir):
+    CurrentDir="/"
+    AfficherDossier(CurrentDir)
+rootLabel=Label(can2,text="Racine du système de fichiers",bg="black",fg="white",cursor="hand2")
+rootLabel.bind("<Button-1>",rootFunction)
+rootLabel.grid(column=0,row=0)
+
 can3=Canvas(width=usedWidth/6-3,heigh=usedHeight/20,highlightthickness=0,bg="gray8")
 can3.place(x=0,y=0)
 
@@ -262,13 +281,12 @@ but3.place(x=(usedWidth/6-3)/8*6,y=0)
 
 scrollbar1.config(command=can1.yview)
 can1['yscrollcommand']=scrollbar1.set
-scrollbar2.config(command=can1.xview)
-can1['xscrollcommand']=scrollbar2.set
+"""scrollbar2.config(command=can1.xview)
+can1['xscrollcommand']=scrollbar2.set"""
 
-tempcan=Canvas(width=usedWidth/6,height=usedHeight/5,highlightthickness=0,bg="orange")
+"""tempcan=Canvas(width=usedWidth/6,height=usedHeight/5,highlightthickness=0,bg="orange")
 tempcan.place(x=0,y=usedHeight/5*4)
-labelRouge=Label(bg="orange",fg="red",text="DANGER, ZONE EN TRAVAUX !")
-labelRouge.place(x=usedWidth/35,y=usedHeight/5*4+0.44*usedHeight/5)
+labelRouge=Label(bg="orange",fg="red",text="DANGER, ZONE EN TRAVAUX !")"""
 
 icon0=ImageTk.PhotoImage(Image.open("images/directory.png"))
 icon0_hid=ImageTk.PhotoImage(Image.open("images/directory_hidden.png"))
@@ -309,7 +327,7 @@ def AfficherDossier(dossier):
     y1=usedHeight/5-95
     currentHeightIconPlacement=0+20
 
-    can1.create_rectangle(0,0,usedWidth,usedHeight,fill="Black")
+    RectangleFiles=can1.create_rectangle(0,0,usedWidth,usedHeight*15,fill="Black")
     lstDir=os.listdir(dossier)
     sortFilesDir(lstDir)
 
