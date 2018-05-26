@@ -44,7 +44,7 @@ def GetFileName(event):
     global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid
     ScrollbarPosition=scrollbar1.get()
     Z=ScrollbarPosition[0]
-    Z=(usedHeight+320)*Z
+    Z=(numeroligne+1)*145*Z
     event.x-=usedWidth/6-3
     X=int(event.x//95)
     Y=int((event.y+Z)//145)
