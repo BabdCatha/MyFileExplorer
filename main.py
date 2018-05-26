@@ -8,7 +8,7 @@ import os
 from PIL import Image, ImageTk
 import shutil
 import hashlib
-#import humanize
+import humanize
 from getpass import *
 
 #TODO: Make the window able to resize itself
@@ -211,8 +211,8 @@ def Properties(FileName,FileOrNot):
     WinProperties=Toplevel(win1)
     WinProperties.title("Propriétés")
     WinProperties.configure(bg="black")
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : ("+str(OctSize)+" octets)").pack()
-    #Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
+    #Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : ("+str(OctSize)+" octets)").pack()
+    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
     #TODO: If not a directory, execute what follows
     if FileOrNot==True:
         MD5Hash=hashlib.md5(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
@@ -263,34 +263,30 @@ def RightClicMenu(event):
 
 win1.bind("<Button-3>",RightClicMenu)
 
-can2=Canvas(width=usedWidth/6,heigh=usedHeight,highlightthickness=0,bg="grey")
+can2=Canvas(width=usedWidth/6,heigh=usedHeight,highlightthickness=0,bg="gray18")
 can2.place(x=0,y=usedHeight/20)
-RectangleCan2=can2.create_rectangle(0,0,usedWidth/6,usedHeight,fill="grey")
 
 ##########<For Linux only>##########
 
 def RootFunction(CurrentDir):
     OpenFile("/",True)
-RootLabel=can2.create_text(0,2,text="Racine", anchor=NW,)
-can2.tag_bind(RootLabel, "<ButtonPress-1>", RootFunction)
+RootText=can2.create_text(0,12,text="Racine",anchor=NW,fill="white")
+can2.tag_bind(RootText,"<ButtonPress-1>",RootFunction)
 
 def MediaFunction(CurrentDir):
-    CurrentUser=getuser()
-    OpenFile("/media"+"/"+str(CurrentUser),True)
-MediaLabel=can2.create_text(0,12,text="Media", anchor=NW,)
-can2.tag_bind(MediaLabel, "<ButtonPress-1>", MediaFunction)
+    OpenFile("/media"+"/"+str(getuser()),True)
+MediaText=can2.create_text(0,32,text="Périphériques",anchor=NW,fill="white")
+can2.tag_bind(MediaText,"<ButtonPress-1>",MediaFunction)
 
 def DownloadsFunction(CurrentDir):
-    CurrentUser=getuser()
-    OpenFile("/home"+"/"+str(CurrentUser)+"/"+"Téléchargements",True)
-DownloadsLabel=can2.create_text(0,22,text="Téléchargements", anchor=NW,)
-can2.tag_bind(DownloadsLabel, "<ButtonPress-1>", DownloadsFunction)
+    OpenFile("/home"+"/"+str(getuser())+"/"+"Téléchargements",True)
+DownloadsText=can2.create_text(0,52,text="Téléchargements",anchor=NW,fill="white")
+can2.tag_bind(DownloadsText,"<ButtonPress-1>",DownloadsFunction)
 
 def DesktopFunction(CurrentDir):
-    CurrentUser=getuser()
-    OpenFile("/home"+"/"+str(CurrentUser)+"/"+"Bureau",True)
-DesktopLabel=can2.create_text(0,32,text="Bureau", anchor=NW,)
-can2.tag_bind(DesktopLabel, "<ButtonPress-1>", DesktopFunction)
+    OpenFile("/home"+"/"+str(getuser())+"/"+"Bureau",True)
+DesktopText=can2.create_text(0,72,text="Bureau", anchor=NW,fill="white")
+can2.tag_bind(DesktopText,"<ButtonPress-1>",DesktopFunction)
 
 ##########</For Linux only>##########
 
