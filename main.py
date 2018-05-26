@@ -263,35 +263,28 @@ RectangleCan2=can2.create_rectangle(0,0,usedWidth/6,usedHeight,fill="grey")
 
 ##########<For Linux only>##########
 
-SpaceLabel=Label(can2,text=" ",bg="grey")
-SpaceLabel.grid(column=0,row=0)
-
 def RootFunction(CurrentDir):
     OpenFile("/",True)
-RootLabel=Label(can2,text="Racine du système de fichiers",bg="grey",fg="white",cursor="hand2")
-RootLabel.bind("<Button-1>",RootFunction)
-RootLabel.grid(column=0,row=1)
+RootLabel=can2.create_text(0,2,text="Racine", anchor=NW,)
+can2.tag_bind(RootLabel, "<ButtonPress-1>", RootFunction)
 
 def MediaFunction(CurrentDir):
     CurrentUser=getuser()
     OpenFile("/media"+"/"+str(CurrentUser),True)
-MediaLabel=Label(can2,text="Médias",bg="grey",fg="white",cursor="hand2")
-MediaLabel.bind("<Button-1>",MediaFunction)
-MediaLabel.grid(column=0,row=2)
+MediaLabel=can2.create_text(0,12,text="Media", anchor=NW,)
+can2.tag_bind(MediaLabel, "<ButtonPress-1>", MediaFunction)
 
 def DownloadsFunction(CurrentDir):
     CurrentUser=getuser()
     OpenFile("/home"+"/"+str(CurrentUser)+"/"+"Téléchargements",True)
-DownloadsLabel=Label(can2,text="Téléchargements",bg="grey",fg="white",cursor="hand2")
-DownloadsLabel.bind("<Button-1>",DownloadsFunction)
-DownloadsLabel.grid(column=0,row=3)
+DownloadsLabel=can2.create_text(0,22,text="Téléchargements", anchor=NW,)
+can2.tag_bind(DownloadsLabel, "<ButtonPress-1>", DownloadsFunction)
 
 def DesktopFunction(CurrentDir):
     CurrentUser=getuser()
     OpenFile("/home"+"/"+str(CurrentUser)+"/"+"Bureau",True)
-DesktopLabel=Label(can2,text="Bureau",bg="grey",fg="white",cursor="hand2")
-DesktopLabel.bind("<Button-1>",DesktopFunction)
-DesktopLabel.grid(column=0,row=4)
+DesktopLabel=can2.create_text(0,32,text="Bureau", anchor=NW,)
+can2.tag_bind(DesktopLabel, "<ButtonPress-1>", DesktopFunction)
 
 ##########</For Linux only>##########
 
