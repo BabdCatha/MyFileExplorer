@@ -162,10 +162,6 @@ def Rename(CurrentDir,FileName):
 
 def ConfirmDelete(CurrentDir,FileName, Button=None): #For "Yes" button
     global RememberChoice
-    '''if Button.getint==0:
-        RememberChoice.set(0)
-    elif Button.getint==1:
-        RememberChoice.set(1)'''
     if os.path.isfile(os.path.join(CurrentDir,FileName))==True:
         os.remove(os.path.join(CurrentDir,FileName))
         AfficherDossier(CurrentDir)
@@ -181,20 +177,13 @@ def CancelDelete():  #For "No" button
     WinDeleteConfirm.destroy()
 def DeleteFile(FileName): #Main delete confirmation window
     global Grid,X,Y,DirGrid,CurrentDir,WinDeleteConfirm,RememberChoice
-    """def OneToZeroAndZeroToOne():
-        global RememberChoice
-        if RememberChoice==0:
-            RememberChoice=1
-        elif RememberChoice==1:
-            RememberChoice=0
-    print("RememberChoice",RememberChoice)""" #Not working
-    if RememberChoice.get()==0: #Not working : RememberChoice==0
+    if RememberChoice.get()==0:
         WinDeleteConfirm=Toplevel(win1)
         WinDeleteConfirm.title("Supprimer")
         WinDeleteConfirm.configure(bg="black")
         WarningLabel=Label(WinDeleteConfirm,bg="black",fg="white",text="Êtes vous sûr de vouloir supprimer\n\""+str(FileName)+"\" ?")
         WarningLabel.pack(side=TOP)
-        RememberChoiceCheckbutton=Checkbutton(WinDeleteConfirm,bg="black",fg="grey50",highlightthickness=0,text="À l'avenir, ne plus demander et supprimer directement", variable=RememberChoice) #Not working, add : command=lambda:OneToZeroAndZeroToOne()
+        RememberChoiceCheckbutton=Checkbutton(WinDeleteConfirm,bg="black",fg="grey50",highlightthickness=0,text="À l'avenir, ne plus demander et supprimer directement", variable=RememberChoice)
         RememberChoiceCheckbutton.pack(side=TOP)
         YesButton=Button(WinDeleteConfirm,bg="black",fg="white",highlightthickness=0,text="Oui",command=lambda:ConfirmDelete(CurrentDir,FileName, RememberChoiceCheckbutton))
         YesButton.pack(side=RIGHT)
@@ -202,7 +191,7 @@ def DeleteFile(FileName): #Main delete confirmation window
         NoButton.pack(side=RIGHT)
         WinDeleteConfirm.mainloop()
     else:
-        ConfirmDelete(CurrentDir,FileName) #Working ... Unfortunately ...
+        ConfirmDelete(CurrentDir,FileName)
 
 def Properties(FileName,FileOrNot):
     print(FileOrNot)
@@ -270,22 +259,22 @@ can2.place(x=0,y=usedHeight/20)
 
 def RootFunction(CurrentDir):
     OpenFile("/",True)
-RootText=can2.create_text(0,12,text="Racine",anchor=NW,fill="white")
+RootText=can2.create_text(usedWidth/12,12,text="Racine",anchor=CENTER,fill="white")
 can2.tag_bind(RootText,"<ButtonPress-1>",RootFunction)
 
 def MediaFunction(CurrentDir):
     OpenFile("/media"+"/"+str(getuser()),True)
-MediaText=can2.create_text(0,32,text="Périphériques",anchor=NW,fill="white")
+MediaText=can2.create_text(usedWidth/12,32,text="Périphériques",anchor=CENTER,fill="white")
 can2.tag_bind(MediaText,"<ButtonPress-1>",MediaFunction)
 
 def DownloadsFunction(CurrentDir):
     OpenFile("/home"+"/"+str(getuser())+"/"+"Téléchargements",True)
-DownloadsText=can2.create_text(0,52,text="Téléchargements",anchor=NW,fill="white")
+DownloadsText=can2.create_text(usedWidth/12,52,text="Téléchargements",anchor=CENTER,fill="white")
 can2.tag_bind(DownloadsText,"<ButtonPress-1>",DownloadsFunction)
 
 def DesktopFunction(CurrentDir):
     OpenFile("/home"+"/"+str(getuser())+"/"+"Bureau",True)
-DesktopText=can2.create_text(0,72,text="Bureau", anchor=NW,fill="white")
+DesktopText=can2.create_text(usedWidth/12,72,text="Bureau", anchor=CENTER,fill="white")
 can2.tag_bind(DesktopText,"<ButtonPress-1>",DesktopFunction)
 
 ##########</For Linux only>##########
