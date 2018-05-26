@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 from tkinter import *
 from random import *
 from platform import system
@@ -7,6 +9,7 @@ from PIL import Image, ImageTk
 import shutil
 import hashlib
 #import humanize
+from getpass import *
 
 #TODO: Make the window able to resize itself
 #TODO: Forward button
@@ -44,7 +47,7 @@ def GetFileName(event):
     Z=(usedHeight+320)*Z
     event.x-=usedWidth/6-3
     X=int(event.x//95)
-    Y=int((event.y+Z)//130)
+    Y=int((event.y+Z)//145)
     print("\nDouble-left clic :\nx :",event.x,"\ny :",event.y,"\nRow :",X,"\nColumn :",Y,"\n") #Debug
     FileName=Grid[X][Y]
     estUnDossier=DirGrid[X][Y]
@@ -61,8 +64,7 @@ def OpenFile(FileName,isDossier):
         #subprocess.call(["mimeopen",FileName])#Close files when file explorer is closed
     elif system=="Windows":
         os.startfile(FileName)
-    can1.delete(RectangleFiles)
-    
+
 
 win1=Tk()
 win1.title("Explorateur de fichiers")
@@ -88,7 +90,7 @@ realWidth,realHeight=win1.winfo_screenwidth(),win1.winfo_screenheight()
 usedWidth,usedHeight=realWidth-13,realHeight-1/20*realHeight
 print("Screen resolution :\nReal x (realHeight) :",realHeight,"\nReal y (realWidth) :",realWidth,"\nUsed x (usedHeight) :",usedHeight,"\nUsed y (usedWidth) :",usedWidth,"\n") #Debug
 
-can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=(0,0,usedWidth,usedHeight*3),bg="black")
+can1=Canvas(width=usedWidth,height=usedHeight,highlightthickness=0,scrollregion=(0,0,usedWidth,usedHeight),bg="black")
 can1.pack()
 can1.bind("<Double-Button-1>",GetFileName)
 
@@ -257,13 +259,41 @@ win1.bind("<Button-3>",RightClicMenu)
 
 can2=Canvas(width=usedWidth/6,heigh=usedHeight,highlightthickness=0,bg="grey")
 can2.place(x=0,y=usedHeight/20)
+RectangleCan2=can2.create_rectangle(0,0,usedWidth/6,usedHeight,fill="grey")
 
-def rootFunction(CurrentDir):
-    CurrentDir="/"
-    AfficherDossier(CurrentDir)
-rootLabel=Label(can2,text="Racine du système de fichiers",bg="black",fg="white",cursor="hand2")
-rootLabel.bind("<Button-1>",rootFunction)
-rootLabel.grid(column=0,row=0)
+##########<For Linux only>##########
+
+SpaceLabel=Label(can2,text=" ",bg="grey")
+SpaceLabel.grid(column=0,row=0)
+
+def RootFunction(CurrentDir):
+    OpenFile("/",True)
+RootLabel=Label(can2,text="Racine du système de fichiers",bg="grey",fg="white",cursor="hand2")
+RootLabel.bind("<Button-1>",RootFunction)
+RootLabel.grid(column=0,row=1)
+
+def MediaFunction(CurrentDir):
+    CurrentUser=getuser()
+    OpenFile("/media"+"/"+str(CurrentUser),True)
+MediaLabel=Label(can2,text="Médias",bg="grey",fg="white",cursor="hand2")
+MediaLabel.bind("<Button-1>",MediaFunction)
+MediaLabel.grid(column=0,row=2)
+
+def DownloadsFunction(CurrentDir):
+    CurrentUser=getuser()
+    OpenFile("/home"+"/"+str(CurrentUser)+"/"+"Téléchargements",True)
+DownloadsLabel=Label(can2,text="Téléchargements",bg="grey",fg="white",cursor="hand2")
+DownloadsLabel.bind("<Button-1>",DownloadsFunction)
+DownloadsLabel.grid(column=0,row=3)
+
+def DesktopFunction(CurrentDir):
+    CurrentUser=getuser()
+    OpenFile("/home"+"/"+str(CurrentUser)+"/"+"Bureau",True)
+DesktopLabel=Label(can2,text="Bureau",bg="grey",fg="white",cursor="hand2")
+DesktopLabel.bind("<Button-1>",DesktopFunction)
+DesktopLabel.grid(column=0,row=4)
+
+##########</For Linux only>##########
 
 can3=Canvas(width=usedWidth/6-3,heigh=usedHeight/20,highlightthickness=0,bg="gray8")
 can3.place(x=0,y=0)
@@ -315,7 +345,7 @@ icon11_hid=ImageTk.PhotoImage(Image.open("images/internet-file_hidden.png"))
 
 def AfficherDossier(dossier):
 
-    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir,LastDir
+    global usedWidth,currentWidthIconPlacement,currentHeightIconPlacement,numeroligne,numerocolonne,Grid,DirGrid,can1,CurrentDir,LastDir, can1
 
     Grid=[] #grille qui contient les icones
     DirGrid=[] #pour différencier les fichiers qu'on peut ouvrir des dossiers à afficher
@@ -330,6 +360,7 @@ def AfficherDossier(dossier):
     RectangleFiles=can1.create_rectangle(0,0,usedWidth,usedHeight*15,fill="Black")
     lstDir=os.listdir(dossier)
     sortFilesDir(lstDir)
+    #print(lstDir, len(lstDir), numeroligne)
 
     for i in lstDir:
         lstLetters=[]
@@ -338,8 +369,8 @@ def AfficherDossier(dossier):
         #print(lstLetters) # For testing purposes
         extFile=os.path.splitext(i)[1]
         print(extFile)
-        if len(i)>17:
-            nameLength=len(i)-17
+        if len(i)>16:
+            nameLength=len(i)-16
             i2=i[:-nameLength]
             i2=i2+"..."
         else:
@@ -463,6 +494,8 @@ def AfficherDossier(dossier):
             Grid[numerocolonne].append(i)
             DirGrid[numerocolonne].append(IsDirectory)
             numerocolonne+=1
+    print(lstDir, len(lstDir), numeroligne)
+    can1.configure(scrollregion=(0,0,usedWidth,(numeroligne+1)*145))
 
 AfficherDossier(CurrentDir)
 
