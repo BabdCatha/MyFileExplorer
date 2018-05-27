@@ -196,7 +196,7 @@ def DeleteFile(FileName): #Main delete confirmation window
         YesButton.pack(side=RIGHT)
         NoButton=Button(WinDeleteConfirm,bg="black",fg="white",highlightthickness=0,text="Non",command=CancelDelete)
         NoButton.pack(side=RIGHT)
-        Prefs=open("config/delete.txt","w")
+        Prefs=open("delete.txt","w")
         Prefs.write(str(RememberChoice.get()))
         WinDeleteConfirm.mainloop()
     else:
