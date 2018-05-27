@@ -114,15 +114,14 @@ def GoBack():
 """def GoForward():
     LastDir,NextDir,CurrentDir""" #TODO: JUST DO IT !!!
 
-def CreateNewDirectory(a,WinNewDirectory):
+def CreateNewDirectory(NameNewDir,WinNewDirectory):
     global CurrentDir
-    NewDirectoryName=str(a)
+    NewDirectoryName=str(NameNewDir)
     MakeNewDirectory=CurrentDir+"/"+str(NewDirectoryName)
     if not os.path.exists(MakeNewDirectory):
         os.makedirs(MakeNewDirectory)
         Reload()
         WinNewDirectory.destroy()
-
 def NewDir(CurrentDir):
     WinNewDirectory=Toplevel(win1)
     WinNewDirectory.configure(bg="black")
@@ -131,7 +130,7 @@ def NewDir(CurrentDir):
     NewDirLabel.pack()
     NewDirectoryName=StringVar(WinNewDirectory)
     NameDir=Entry(WinNewDirectory,bg="white",fg="black",textvariable=NewDirectoryName)
-    NameDir.bind("<Return>",lambda x : CreateNewDirectory(NameDir.get(), WinNewDirectory))
+    NameDir.bind("<Return>",lambda x: CreateNewDirectory(NameDir.get(),WinNewDirectory))
     NameDir.pack(side=TOP)
     WinNewDirectory.mainloop()
 
@@ -147,9 +146,9 @@ def PasteFile(Directory):
         shutil.copy2(CopiedFile,Directory)
     AfficherDossier(CurrentDir)
 
-def RenameFile(a, WinRename, FileName):
+def RenameFile(NameRename, WinRename, FileName):
     global CurrentDir  #Must be an argument even if it is not used
-    NewFileName=str(a)
+    NewFileName=str(NameRename)
     NewFileName=CurrentDir+"/"+str(NewFileName)
     WinRename.destroy()
     shutil.move(str(CurrentDir)+"/"+str(FileName),str(NewFileName))
@@ -211,7 +210,6 @@ def Properties(FileName,FileOrNot):
     WinProperties.configure(bg="black")
     #Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : ("+str(OctSize)+" octets)").pack()
     Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
-    #TODO: If not a directory, execute what follows
     if FileOrNot==True:
         MD5Hash=hashlib.md5(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
         SHA1Hash=hashlib.sha1(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
