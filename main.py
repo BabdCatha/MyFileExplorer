@@ -8,7 +8,7 @@ import os
 from PIL import Image, ImageTk
 import shutil
 import hashlib
-import humanize
+#import humanize
 from getpass import *
 import webbrowser
 
@@ -74,6 +74,12 @@ win1.tk.call('wm','iconphoto',win1._w,favicon)
 
 RememberChoice = IntVar(win1)
 RememberChoice.set(0)
+
+Pref = open('images/delete.txt', "r")
+try:
+    RememberChoice.set(int(Pref.read()))
+except:
+    pass
 
 scrollbar1=Scrollbar(win1,orient=VERTICAL)
 scrollbar1.pack(side=RIGHT,fill=Y)
@@ -190,6 +196,8 @@ def DeleteFile(FileName): #Main delete confirmation window
         YesButton.pack(side=RIGHT)
         NoButton=Button(WinDeleteConfirm,bg="black",fg="white",highlightthickness=0,text="Non",command=CancelDelete)
         NoButton.pack(side=RIGHT)
+        Prefs = open("delete.txt", "w")
+        Prefs.write(str(RememberChoice.get()))
         WinDeleteConfirm.mainloop()
     else:
         ConfirmDelete(CurrentDir,FileName)
