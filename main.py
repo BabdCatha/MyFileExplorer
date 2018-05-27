@@ -10,6 +10,7 @@ import shutil
 import hashlib
 import humanize
 from getpass import *
+import webbrowser
 
 #TODO: Make the window able to resize itself
 #TODO: Forward button
@@ -227,7 +228,7 @@ def sortFilesDir(lstDir):
     lstDir.sort(key=alphanum_key)
 
 RightClic=Menu(win1,tearoff=0)
-RightClic.add_command(label="Nouveau dossier",command=lambda:NewDir(CurrentDir))#TODO
+RightClic.add_command(label="Nouveau dossier",command=lambda:NewDir(CurrentDir))
 RightClic.add_command(label="Copier",command=lambda:CopyFile(Grid[int(X)][int(Y)]))
 RightClic.add_command(label="Coller",command=lambda:PasteFile(CurrentDir))
 RightClic.add_command(label="Renommer",command=lambda:Rename(CurrentDir,Grid[int(X)][int(Y)]))
@@ -259,23 +260,28 @@ can2.place(x=0,y=usedHeight/20)
 
 def RootFunction(CurrentDir):
     OpenFile("/",True)
-RootText=can2.create_text(usedWidth/12,12,text="Racine",anchor=CENTER,fill="white")
+RootText=can2.create_text(usedWidth/12,22,text="Racine",anchor=CENTER,fill="white")
 can2.tag_bind(RootText,"<ButtonPress-1>",RootFunction)
 
 def MediaFunction(CurrentDir):
     OpenFile("/media"+"/"+str(getuser()),True)
-MediaText=can2.create_text(usedWidth/12,32,text="Périphériques",anchor=CENTER,fill="white")
+MediaText=can2.create_text(usedWidth/12,42,text="Périphériques",anchor=CENTER,fill="white")
 can2.tag_bind(MediaText,"<ButtonPress-1>",MediaFunction)
 
 def DownloadsFunction(CurrentDir):
     OpenFile("/home"+"/"+str(getuser())+"/"+"Téléchargements",True)
-DownloadsText=can2.create_text(usedWidth/12,52,text="Téléchargements",anchor=CENTER,fill="white")
+DownloadsText=can2.create_text(usedWidth/12,62,text="Téléchargements",anchor=CENTER,fill="white")
 can2.tag_bind(DownloadsText,"<ButtonPress-1>",DownloadsFunction)
 
 def DesktopFunction(CurrentDir):
     OpenFile("/home"+"/"+str(getuser())+"/"+"Bureau",True)
-DesktopText=can2.create_text(usedWidth/12,72,text="Bureau", anchor=CENTER,fill="white")
+DesktopText=can2.create_text(usedWidth/12,82,text="Bureau", anchor=CENTER,fill="white")
 can2.tag_bind(DesktopText,"<ButtonPress-1>",DesktopFunction)
+
+def WebsiteFunction(a):
+    webbrowser.open("https://github.com/BabDCatha/MyFileExplorer")
+WebsiteText=can2.create_text(usedWidth/12,usedHeight/20*18,text="Mises à jour", anchor=CENTER,fill="gray75")
+can2.tag_bind(WebsiteText,"<ButtonPress-1>",WebsiteFunction)
 
 ##########</For Linux only>##########
 
@@ -352,9 +358,10 @@ def AfficherDossier(dossier):
             lstLetters.append(j)
         #print(lstLetters) # For testing purposes
         extFile=os.path.splitext(i)[1]
+        extFile=extFile.lower()
         print(extFile)
-        if len(i)>16:
-            nameLength=len(i)-16
+        if len(i)>15:
+            nameLength=len(i)-15
             i2=i[:-nameLength]
             i2=i2+"..."
         else:
@@ -395,11 +402,11 @@ def AfficherDossier(dossier):
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon5_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
-            elif extFile==".jpg" or extFile==".png" or extFile==".gif" and hidden==0:
+            elif extFile==".jpg" or extFile==".jpeg" or extFile==".png" or extFile==".gif" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon6)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
-            elif extFile==".jpg" or extFile==".png" or extFile==".gif" and hidden==1:
+            elif extFile==".jpg" or extFile==".jpeg" or extFile==".png" or extFile==".gif" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon6_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
