@@ -14,12 +14,7 @@ import webbrowser
 
 #TODO: Make the window able to resize itself
 #TODO: Forward button
-#TODO: Left panel items
-#TODO: Fix opening file after going forward issue
-#TODO: Add informations in Properties : file size (human readeable), type (xdg), location, ...
-#TODO: Fix directories Properties
 
-#FileNameclique="" #Not used
 LastDir=""
 NextDir=""
 CopiedFile=""
@@ -33,9 +28,7 @@ else:
 LastDir=CurrentDir
 
 def commande1():
-    print("LaTeX")
-def commande2():
-    print("blob")
+    print("Inutile ...")
 def quitter():
     print("Quitter")
     win1.destroy()
@@ -61,7 +54,6 @@ def OpenFile(FileName,isDossier):
         AfficherDossier(FileName)
     elif system!="Windows":
         subprocess.call(["xdg-open",FileName])#Do not open files correctly
-        #subprocess.call(["mimeopen",FileName])#Close files when file explorer is closed
     elif system=="Windows":
         os.startfile(FileName)
 
@@ -88,10 +80,9 @@ scrollbar2.pack(side=BOTTOM,fill=X)"""
 
 menu1=Menu(win1)
 filemenu=Menu(menu1, tearoff=0)
-filemenu.add_command(label="LaTeX",command=commande1)
-filemenu.add_command(label="Useless button",command=commande2)
+filemenu.add_command(label="Bouton inutile",command=commande1)
 filemenu.add_separator()
-filemenu.add_command(label="Exit",command=quitter)
+filemenu.add_command(label="Quitter",command=quitter)
 menu1.add_cascade(label="Menu",menu=filemenu)
 win1.config(menu=menu1)
 
@@ -147,7 +138,7 @@ def PasteFile(Directory):
     AfficherDossier(CurrentDir)
 
 def RenameFile(NameRename, WinRename, FileName):
-    global CurrentDir  #Must be an argument even if it is not used
+    global CurrentDir
     NewFileName=str(NameRename)
     NewFileName=CurrentDir+"/"+str(NewFileName)
     WinRename.destroy()
