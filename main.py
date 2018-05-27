@@ -8,7 +8,7 @@ import os
 from PIL import Image, ImageTk
 import shutil
 import hashlib
-#import humanize
+import humanize
 from getpass import *
 import webbrowser
 
@@ -72,10 +72,10 @@ favicon=ImageTk.PhotoImage(Image.open("images/favicon2_75.png"))
 win1.tk.call('wm','iconphoto',win1._w,favicon)
 #win1.state("zoomed") #For Windows only
 
-RememberChoice = IntVar(win1)
+RememberChoice=IntVar(win1)
 RememberChoice.set(0)
 
-Pref = open('images/delete.txt', "r")
+Pref=open('config/delete.txt',"r")
 try:
     RememberChoice.set(int(Pref.read()))
 except:
@@ -196,7 +196,7 @@ def DeleteFile(FileName): #Main delete confirmation window
         YesButton.pack(side=RIGHT)
         NoButton=Button(WinDeleteConfirm,bg="black",fg="white",highlightthickness=0,text="Non",command=CancelDelete)
         NoButton.pack(side=RIGHT)
-        Prefs = open("delete.txt", "w")
+        Prefs=open("config/delete.txt","w")
         Prefs.write(str(RememberChoice.get()))
         WinDeleteConfirm.mainloop()
     else:
@@ -410,11 +410,11 @@ def AfficherDossier(dossier):
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon5_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
-            elif extFile==".jpg" or extFile==".jpeg" or extFile==".png" or extFile==".gif" and hidden==0:
+            elif extFile==".jpg" or extFile==".jpeg" or extFile==".png" or extFile==".gif" or extFile==".bmp" and hidden==0:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon6)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
-            elif extFile==".jpg" or extFile==".jpeg" or extFile==".png" or extFile==".gif" and hidden==1:
+            elif extFile==".jpg" or extFile==".jpeg" or extFile==".png" or extFile==".gif" or extFile==".bmp" and hidden==1:
                 icon=can1.create_image(currentWidthIconPlacement+37.5,currentHeightIconPlacement+37.5,image=icon6_hid)
                 lab1=can1.create_text(currentWidthIconPlacement+37.5,currentHeightIconPlacement+87.5,text=i2,fill="white",width=75,justify=CENTER)
                 IsDirectory=False
