@@ -317,6 +317,9 @@ can1['xscrollcommand']=scrollbar2.set"""
 tempcan.place(x=0,y=usedHeight/5*4)
 labelRouge=Label(bg="orange",fg="red",text="DANGER, ZONE EN TRAVAUX !")"""
 
+testEntry=Text(win1,height=int(usedHeight/5),width=int((usedWidth/9)*(1/6)), font="Helvetica 12")
+testEntry.place(x=1,y=usedHeight/5*4+1)
+
 icon0=ImageTk.PhotoImage(Image.open("images/directory.png"))
 icon0_hid=ImageTk.PhotoImage(Image.open("images/directory_hidden.png"))
 icon1=ImageTk.PhotoImage(Image.open("images/empty.png"))
