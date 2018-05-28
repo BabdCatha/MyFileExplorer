@@ -8,9 +8,13 @@ import os
 from PIL import Image, ImageTk
 import shutil
 import hashlib
-import humanize
 from getpass import *
 import webbrowser
+
+try:
+    import humanize
+except:
+    pass
 
 #TODO: Make the window able to resize itself
 #TODO: Forward button
@@ -200,7 +204,10 @@ def Properties(FileName,FileOrNot):
     WinProperties.title("Propriétés")
     WinProperties.configure(bg="black")
     #Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : ("+str(OctSize)+" octets)").pack()
-    Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
+    try:    
+        Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(humanize.naturalsize(OctSize))+" ("+str(OctSize)+" octets)").pack()
+    except:
+        Label(WinProperties,bg="black",fg="white",justify=LEFT,text="Nom : "+str(FileName)+"\nTaille : "+str(OctSize)).pack()
     if FileOrNot==True:
         MD5Hash=hashlib.md5(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
         SHA1Hash=hashlib.sha1(open(str(CurrentDir)+"/"+str(FileName),"rb").read()).hexdigest()
@@ -232,14 +239,19 @@ RightClic.add_command(label="Renommer",command=lambda:Rename(CurrentDir,Grid[int
 RightClic.add_command(label="Supprimer",command=lambda:DeleteFile(Grid[int(X)][int(Y)]))
 RightClic.add_command(label="Propriétés",command=lambda:Properties(Grid[int(X)][int(Y)],os.path.isfile(os.path.join(CurrentDir,Grid[int(X)][int(Y)]))))
 def RightClicMenu(event):
+    global Z
     if event.x>=realWidth/6 and event.y>=0:
         try:
             RightClic.tk_popup(event.x_root+60,event.y_root+11,0)
             global numerocolonne,numeroligne,usedWidth,Grid,CurrentDir,DirGrid,X,Y
             try:
+                #event.x-=usedWidth/6-3
+                ScrollbarPosition=scrollbar1.get()
+                Z=ScrollbarPosition[0]
+                Z=(numeroligne+1)*145*Z
                 event.x-=usedWidth/6-3
                 X=int(event.x//95)
-                Y=int(event.y//145)
+                Y=int((event.y+Z)//145)
                 print("\nRight clic :\nx :",event.x,"\ny :",event.y,"\nRow :",X,"\nColumn :",Y,"\n") #Debug
                 FileName=Grid[X][Y]
                 estUnDossier=DirGrid[X][Y]
