@@ -50,7 +50,7 @@ def GetFileName(event):
     estUnDossier=DirGrid[X][Y]
     OpenFile(CurrentDir+"/"+FileName,estUnDossier)
 
-def OpenFile(FileName,isDossier):
+def OpenFile(FileName,isDossier, Back=False):
     global CurrentDir,OldDir,LastDir
     if isDossier:
         LastDir=CurrentDir
@@ -104,7 +104,7 @@ def Reload():
 def GoBack():
     global LastDir,NextDir,CurrentDir
     NextDir=CurrentDir
-    OpenFile(LastDir,True)
+    OpenFile(LastDir,True, True)
 
 """def GoForward():
     LastDir,NextDir,CurrentDir""" #TODO: JUST DO IT !!!
@@ -268,7 +268,10 @@ can2.place(x=0,y=usedHeight/20)
 ##########<For Linux only>##########
 
 def RootFunction(CurrentDir):
-    OpenFile("/",True)
+    if system=="Windows":
+        OpenFile("C:", True)
+    else:
+        OpenFile("/",True)
 RootText=can2.create_text(usedWidth/12,22,text="Racine",anchor=CENTER,fill="white")
 can2.tag_bind(RootText,"<ButtonPress-1>",RootFunction)
 
